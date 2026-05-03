@@ -139,15 +139,16 @@
 
 .top-picks-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--space-4-5);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-3);
 }
 
 .pick-card {
-  min-height: var(--generated-length-266px);
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
+  min-width: 0;
+  padding: 0;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  align-content: start;
   overflow: hidden;
   border-radius: var(--radius-ui);
   background: var(--app-accent);
@@ -156,18 +157,30 @@
 }
 
 .pick-card img {
+  display: block;
   width: 100%;
-  height: var(--generated-length-188px);
+  aspect-ratio: 4 / 3;
+  height: auto;
   object-fit: cover;
 }
 
 .pick-card span {
-  padding: var(--space-3-5);
+  min-width: 0;
+  padding: var(--space-2-5);
+}
+
+.pick-card strong {
+  font-size: var(--text-ui-lg);
+  line-height: 1.2;
+  overflow-wrap: anywhere;
 }
 
 .pick-card small {
   margin-top: var(--space-1);
   color: var(--action-primary-text);
+  font-size: var(--text-ui-sm);
+  line-height: 1.25;
+  overflow-wrap: anywhere;
 }
 
 .cover-tile {
@@ -197,7 +210,20 @@
 
 @media (max-width: 700px) {
   .top-picks-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-2);
+  }
+
+  .pick-card span {
+    padding: var(--space-2);
+  }
+
+  .pick-card strong {
+    font-size: var(--text-ui-sm);
+  }
+
+  .pick-card small {
+    font-size: var(--text-ui-xs);
   }
 }
 
@@ -221,30 +247,27 @@
   }
 
   .home-top-picks-section {
-    grid-column: 2;
-    grid-row: 3 / span 3;
+    grid-column: 1 / -1;
   }
 
   .home-top-picks-section .top-picks-grid {
-    grid-template-columns: 1fr;
-    gap: var(--space-3);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-4);
   }
 
   .home-top-picks-section .pick-card {
-    min-height: var(--space-28);
     display: grid;
-    grid-template-columns: var(--space-28) 1fr;
+    grid-template-columns: 1fr;
   }
 
   .home-top-picks-section .pick-card img {
-    width: var(--space-28);
-    height: 100%;
-    min-height: var(--space-28);
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    height: auto;
+    min-height: 0;
   }
 
   .home-top-picks-section .pick-card span {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
+    display: block;
   }
 }
