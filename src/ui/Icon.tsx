@@ -3,11 +3,11 @@ import { cx } from './classes';
 
 export type AppIconSize = 'compact' | 'standard' | 'large' | 'navigation';
 
-const appIconSizes: Record<AppIconSize, string> = {
-  compact: 'var(--icon-size-compact)',
-  standard: 'var(--icon-size-standard)',
-  large: 'var(--icon-size-large)',
-  navigation: 'var(--icon-size-navigation)'
+const appIconSizeClasses: Record<AppIconSize, string> = {
+  compact: 'app-icon-compact',
+  standard: 'app-icon-standard',
+  large: 'app-icon-large',
+  navigation: 'app-icon-navigation'
 };
 
 export interface AppIconProps extends Omit<LucideProps, 'size'> {
@@ -17,5 +17,5 @@ export interface AppIconProps extends Omit<LucideProps, 'size'> {
 }
 
 export function AppIcon({ icon: Icon, size = 'standard', decorative = true, className, ...props }: AppIconProps) {
-  return <Icon className={cx('app-icon', className)} size={appIconSizes[size]} aria-hidden={decorative || undefined} focusable="false" {...props} />;
+  return <Icon className={cx('app-icon', appIconSizeClasses[size], className)} aria-hidden={decorative || undefined} focusable="false" {...props} />;
 }

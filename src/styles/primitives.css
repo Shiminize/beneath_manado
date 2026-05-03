@@ -78,6 +78,24 @@
 .app-icon {
   display: block;
   flex: 0 0 auto;
+  width: var(--app-icon-size, var(--icon-size-standard));
+  height: var(--app-icon-size, var(--icon-size-standard));
+}
+
+.app-icon-compact {
+  --app-icon-size: var(--icon-size-compact);
+}
+
+.app-icon-standard {
+  --app-icon-size: var(--icon-size-standard);
+}
+
+.app-icon-large {
+  --app-icon-size: var(--icon-size-large);
+}
+
+.app-icon-navigation {
+  --app-icon-size: var(--icon-size-navigation);
 }
 
 .book-cover {
