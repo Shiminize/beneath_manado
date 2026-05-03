@@ -139,6 +139,8 @@ export function AdminScreen() {
             <input
               aria-label="Owner password"
               autoComplete="current-password"
+              id="admin-password"
+              name="admin-password"
               value={password}
               onChange={(event) => setPassword(event.target.value)}
               placeholder="Password"
@@ -158,7 +160,7 @@ export function AdminScreen() {
           <section className="admin-toolbar" aria-label="Analytics filters">
             <label>
               Range
-              <select value={range} onChange={(event) => setRange(event.target.value)}>
+              <select id="admin-range" name="admin-range" value={range} onChange={(event) => setRange(event.target.value)}>
                 <option value="7d">7 days</option>
                 <option value="30d">30 days</option>
                 <option value="90d">90 days</option>
