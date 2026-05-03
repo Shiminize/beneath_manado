@@ -14,6 +14,7 @@ const items: LibraryItem[] = [
     section: '',
     tags: [],
     totalChapters: 1,
+    wordCount: 1,
     content: [{ chapter: 1, isChapterStart: true, title: 'Chapter', content: '<p>Text</p>' }],
     initialStatus: 'reading'
   }

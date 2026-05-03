@@ -1,0 +1,13 @@
+{
+  "functions": {
+    "api/**/*.js": {
+      "includeFiles": "src/features/{books,reader}/**/*.{json,js}"
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/admin",
+      "destination": "/index.html"
+    }
+  ]
+}

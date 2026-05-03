@@ -1,7 +1,11 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import type { AppRoute, AppState, ReaderLocation, ReaderPreferences, ReadingStatus } from './app/types';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import type { AppRoute, AppState, BookContent, ReaderLocation, ReaderPreferences, ReadingStatus } from './app/types';
+import { AdminScreen } from './features/admin/AdminScreen';
+import { BookAccessOverlay } from './features/access/BookAccessOverlay';
+import { trackAnalyticsEvent } from './features/analytics/client';
 import { packagedLibrary } from './features/books/libraryData';
 import { buildSuggestions } from './features/books/suggestions';
+import { BookLockedError, fetchBookContent, unlockBook } from './features/books/contentClient';
 import { HomeScreen } from './features/home/HomeScreen';
 import { LibraryScreen } from './features/library/LibraryScreen';
 import { ReaderScreen } from './features/reader/ReaderScreen';
@@ -12,13 +16,23 @@ import { Navigation } from './ui';
 export function App() {
   const items = packagedLibrary;
   const [appState, setAppState] = useState<AppState>(() => loadAppState(items));
-  const [route, setRoute] = useState<AppRoute>({ view: 'home' });
+  const [route, setRoute] = useState<AppRoute>(() => (window.location.pathname === '/admin' ? { view: 'admin' } : { view: 'home' }));
+  const [bookContentById, setBookContentById] = useState<Record<string, BookContent[]>>({});
+  const [accessState, setAccessState] = useState<BookAccessState>({ status: 'idle' });
+  const lastReaderEvent = useRef<{ itemId: string; location: ReaderLocation; startedAt: number } | null>(null);
   const suggestions = useMemo(() => buildSuggestions(items, appState), [appState, items]);
   const activeReaderItemId = route.view === 'reader' ? route.itemId : undefined;
 
   useEffect(() => {
     saveAppState(appState);
   }, [appState]);
+
+  useEffect(() => {
+    trackAnalyticsEvent({ type: 'session_start' });
+    const handlePageHide = () => trackAnalyticsEvent({ type: 'session_end' });
+    window.addEventListener('pagehide', handlePageHide);
+    return () => window.removeEventListener('pagehide', handlePageHide);
+  }, []);
 
   useEffect(() => {
     if (route.view !== 'reader') return;
@@ -44,8 +58,27 @@ export function App() {
   }, [route]);
 
   const openItem = useCallback(
-    (itemId: string, chapterIndex?: number) => {
+    async (itemId: string, chapterIndex?: number) => {
+      setAccessState({ status: 'loading', itemId, chapterIndex });
       const progress = appState.progress[itemId];
+      let content = bookContentById[itemId];
+
+      try {
+        if (!content) {
+          content = await fetchBookContent(itemId);
+          setBookContentById((current) => ({ ...current, [itemId]: content }));
+        }
+      } catch (error) {
+        if (error instanceof BookLockedError) {
+          setAccessState({ status: 'locked', itemId, title: error.title, chapterIndex });
+          return;
+        }
+
+        setAccessState({ status: 'error', itemId, message: error instanceof Error ? error.message : 'Unable to load this book.' });
+        return;
+      }
+
+      lastReaderEvent.current = null;
       setRoute({
         view: 'reader',
         itemId,
@@ -54,8 +87,10 @@ export function App() {
           pageIndex: chapterIndex === undefined ? progress?.pageIndex ?? 0 : 0
         }
       });
+      setAccessState({ status: 'idle' });
+      trackAnalyticsEvent({ type: 'book_open', bookId: itemId, totalChapters: content.length });
     },
-    [appState.progress]
+    [appState.progress, bookContentById]
   );
 
   const updateProgress = useCallback((itemId: string, location: ReaderLocation, percent: number) => {
@@ -87,8 +122,27 @@ export function App() {
     (location: ReaderLocation, percent: number) => {
       if (!activeReaderItemId) return;
       updateProgress(activeReaderItemId, location, percent);
+      const currentContent = bookContentById[activeReaderItemId];
+      const now = Date.now();
+      const previous = lastReaderEvent.current;
+      const isSameLocation =
+        previous?.itemId === activeReaderItemId &&
+        previous.location.chapterIndex === location.chapterIndex &&
+        previous.location.pageIndex === location.pageIndex;
+      if (isSameLocation) return;
+
+      trackAnalyticsEvent({
+        type: 'page_view',
+        bookId: activeReaderItemId,
+        chapterIndex: location.chapterIndex,
+        pageIndex: location.pageIndex,
+        percent,
+        durationSeconds: previous?.itemId === activeReaderItemId ? Math.round((now - previous.startedAt) / 1000) : 0,
+        totalChapters: currentContent?.length
+      });
+      lastReaderEvent.current = { itemId: activeReaderItemId, location, startedAt: now };
     },
-    [activeReaderItemId, updateProgress]
+    [activeReaderItemId, bookContentById, updateProgress]
   );
 
   const updatePreferences = useCallback((preferences: Partial<ReaderPreferences>) => {
@@ -133,23 +187,31 @@ export function App() {
     }));
   }, []);
 
-  const activeView = route.view;
-
   if (route.view === 'reader') {
     const item = items.find((candidate) => candidate.id === route.itemId);
+    const content = bookContentById[route.itemId];
     if (!item) return null;
+    if (!content) return null;
+    const readerItem = { ...item, content };
 
     return (
       <ReaderScreen
         key={item.id}
-        item={item}
+        item={readerItem}
         initialLocation={route.location}
         preferences={appState.preferences}
-        onClose={() => setRoute({ view: 'home' })}
+        onClose={() => {
+          lastReaderEvent.current = null;
+          setRoute({ view: 'home' });
+        }}
         onProgressChange={updateActiveReaderProgress}
         onPreferencesChange={updatePreferences}
       />
     );
+  }
+
+  if (route.view === 'admin') {
+    return <AdminScreen />;
   }
 
   return (
@@ -181,13 +243,32 @@ export function App() {
       {route.view === 'search' && <SearchScreen items={items} initialQuery={route.query} onOpenItem={openItem} />}
 
       <Navigation
-        activeView={activeView}
+        activeView={route.view}
         onNavigate={(view) => {
           if (view === 'library') setRoute({ view: 'library' });
           else if (view === 'search') setRoute({ view: 'search' });
           else setRoute({ view: 'home' });
         }}
       />
+      {accessState.status !== 'idle' && (
+        <BookAccessOverlay
+          status={accessState.status}
+          title={accessState.status === 'locked' ? accessState.title : undefined}
+          message={accessState.status === 'error' ? accessState.message : undefined}
+          onCancel={() => setAccessState({ status: 'idle' })}
+          onUnlock={async (password) => {
+            if (accessState.status !== 'locked') return;
+            await unlockBook(accessState.itemId, password);
+            await openItem(accessState.itemId, accessState.chapterIndex);
+          }}
+        />
+      )}
     </div>
   );
 }
+
+type BookAccessState =
+  | { status: 'idle' }
+  | { status: 'loading'; itemId: string; chapterIndex?: number }
+  | { status: 'locked'; itemId: string; title: string; chapterIndex?: number }
+  | { status: 'error'; itemId?: string; message: string };

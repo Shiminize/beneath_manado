@@ -1,4 +1,4 @@
-export type AppView = 'home' | 'library' | 'search' | 'reader';
+export type AppView = 'home' | 'library' | 'search' | 'reader' | 'admin';
 
 export type LibraryItemType = 'book' | 'pdf' | 'sample';
 
@@ -37,6 +37,7 @@ export interface LibraryItem {
   section: string;
   tags: string[];
   totalChapters: number;
+  wordCount: number;
   content: BookContent[];
   initialStatus: ReadingStatus;
 }
@@ -108,4 +109,5 @@ export type AppRoute =
   | { view: 'home' }
   | { view: 'library'; collectionId?: string }
   | { view: 'search'; query?: string }
-  | { view: 'reader'; itemId: string; location?: ReaderLocation };
+  | { view: 'reader'; itemId: string; location?: ReaderLocation }
+  | { view: 'admin' };

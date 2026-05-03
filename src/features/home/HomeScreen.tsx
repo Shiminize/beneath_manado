@@ -1,6 +1,5 @@
 import { BookOpen, ChevronRight, Minus, Plus, Star } from 'lucide-react';
 import type { AppState, LibraryItem, ReadingProgress, Suggestion } from '../../app/types';
-import { stripHtml } from '../reader/pagination';
 import { AppIcon, BookCover, IconButton } from '../../ui';
 
 interface HomeScreenProps {
@@ -115,6 +114,10 @@ export function HomeScreen({ items, state, suggestions, onOpenItem, onNavigateLi
         <strong>{items.length} packaged items</strong>
         <span>{countWords(items)} saved words across books, samples, and PDFs.</span>
       </section>
+
+      <section className="privacy-note" aria-label="Privacy note">
+        Reader analytics collect views, reading progress, and approximate network information for owner insight. Full IP addresses are not stored.
+      </section>
     </main>
   );
 }
@@ -125,10 +128,7 @@ function isFinishedThisYear(progress: ReadingProgress): boolean {
 }
 
 function countWords(items: LibraryItem[]): string {
-  const words = items.reduce((total, item) => {
-    const itemWords = item.content.reduce((chapterTotal, chapter) => chapterTotal + stripHtml(chapter.content).split(/\s+/).filter(Boolean).length, 0);
-    return total + itemWords;
-  }, 0);
+  const words = items.reduce((total, item) => total + item.wordCount, 0);
 
   if (words > 1000) return `${Math.round(words / 1000)}k`;
   return String(words);

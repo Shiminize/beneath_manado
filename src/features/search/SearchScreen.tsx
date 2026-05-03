@@ -2,7 +2,6 @@ import { Search } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import type { LibraryItem } from '../../app/types';
 import { Field } from '../../ui';
-import { searchBook } from '../reader/search';
 
 interface SearchScreenProps {
   items: LibraryItem[];
@@ -16,12 +15,7 @@ export function SearchScreen({ items, initialQuery = '', onOpenItem }: SearchScr
     const trimmed = query.trim();
     if (!trimmed) return [];
 
-    return items.flatMap((item) =>
-      searchBook(item.content, trimmed).map((result) => ({
-        item,
-        ...result
-      }))
-    );
+    return searchLibraryMetadata(items, trimmed);
   }, [items, query]);
 
   return (
@@ -39,7 +33,7 @@ export function SearchScreen({ items, initialQuery = '', onOpenItem }: SearchScr
           name="global-search"
           value={query}
           onChange={(event) => setQuery(event.target.value)}
-          placeholder="Find a title, word, phrase, or page"
+          placeholder="Find a title, author, genre, or collection"
           autoFocus
         />
       </Field>
@@ -60,4 +54,20 @@ export function SearchScreen({ items, initialQuery = '', onOpenItem }: SearchScr
       </section>
     </main>
   );
+}
+
+function searchLibraryMetadata(items: LibraryItem[], query: string) {
+  const normalized = query.toLowerCase();
+  return items
+    .filter((item) => {
+      const haystack = [item.title, item.author, item.subtitle, item.description, item.section, ...item.tags].join(' ').toLowerCase();
+      return haystack.includes(normalized);
+    })
+    .map((item) => ({
+      item,
+      chapterIndex: undefined,
+      title: item.title,
+      snippet: item.description
+    }))
+    .slice(0, 24);
 }
