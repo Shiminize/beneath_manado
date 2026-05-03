@@ -1,5 +1,14 @@
 import type { LibraryItem } from '../../app/types';
-import { assetUrlFor, frictionBookContent } from './legacyCartridge';
+import {
+  algorithmOfEnvyContent,
+  assetUrlFor,
+  beneathManadoContent,
+  echoChamberContent,
+  frictionBookContent,
+  structuralIntegrityOfWallsContent,
+  sunriseHarvestContent,
+  theImposterContent
+} from './legacyCartridge';
 
 export const packagedLibrary: LibraryItem[] = [
   {
@@ -15,6 +24,90 @@ export const packagedLibrary: LibraryItem[] = [
     totalChapters: frictionBookContent.length,
     content: frictionBookContent,
     initialStatus: 'reading'
+  },
+  {
+    id: 'algorithm-of-envy',
+    type: 'book',
+    title: 'The Algorithm of Envy',
+    author: 'Shiminize',
+    subtitle: 'Digital psychological thriller',
+    cover: assetUrlFor('src/assets/images/books/algorithm-of-envy/cover.jpg'),
+    description: 'A social algorithm, a rejected obsession, and the data trail left by envy.',
+    section: 'Imported Novels',
+    tags: ['psychological thriller', 'algorithmic obsession', 'digital intimacy'],
+    totalChapters: algorithmOfEnvyContent.length,
+    content: algorithmOfEnvyContent,
+    initialStatus: 'want-to-read'
+  },
+  {
+    id: 'echo-chamber',
+    type: 'book',
+    title: 'The Echo Chamber',
+    author: 'Shiminize',
+    subtitle: 'Voice-room psychological horror',
+    cover: assetUrlFor('src/assets/images/books/echo-chamber/cover.png'),
+    description: 'A digital room turns unstable as projection, surveillance, and identity fold into one another.',
+    section: 'Imported Novels',
+    tags: ['psychological horror', 'voice room', 'digital identity'],
+    totalChapters: echoChamberContent.length,
+    content: echoChamberContent,
+    initialStatus: 'want-to-read'
+  },
+  {
+    id: 'sunrise-harvest',
+    type: 'book',
+    title: 'The Sunrise Harvest',
+    author: 'Shiminize',
+    subtitle: 'Tropical psychological horror',
+    cover: assetUrlFor('src/assets/images/books/sunrise-harvest/cover.jpg'),
+    description: 'A Manado heatwave of ritual, hunger, and digital residue.',
+    section: 'Imported Novels',
+    tags: ['Manado', 'psychological horror', 'ritual'],
+    totalChapters: sunriseHarvestContent.length,
+    content: sunriseHarvestContent,
+    initialStatus: 'want-to-read'
+  },
+  {
+    id: 'structural-integrity-of-walls',
+    type: 'book',
+    title: 'The Structural Integrity of Walls',
+    author: 'Shiminize',
+    subtitle: 'Psychological suspense',
+    cover: assetUrlFor('src/assets/images/books/structural-integrity-of-walls/cover.png'),
+    description: 'A private chat becomes a test of safety, pressure, and everything people build to stay intact.',
+    section: 'Imported Novels',
+    tags: ['psychological suspense', 'digital intimacy', 'collapse'],
+    totalChapters: structuralIntegrityOfWallsContent.length,
+    content: structuralIntegrityOfWallsContent,
+    initialStatus: 'want-to-read'
+  },
+  {
+    id: 'beneath-manado',
+    type: 'book',
+    title: 'Beneath Manado',
+    author: 'Shiminize',
+    subtitle: 'Literary psychological horror',
+    cover: assetUrlFor('src/assets/images/books/beneath-manado/cover.jpg'),
+    description: 'A long-form Manado novel about rejection, performance, and the body under social pressure.',
+    section: 'Imported Novels',
+    tags: ['Manado', 'literary horror', 'social pressure'],
+    totalChapters: beneathManadoContent.length,
+    content: beneathManadoContent,
+    initialStatus: 'want-to-read'
+  },
+  {
+    id: 'the-imposter',
+    type: 'book',
+    title: 'The Imposter',
+    author: 'Shiminize',
+    subtitle: 'Identity psychological thriller',
+    cover: assetUrlFor('src/assets/images/books/the-imposter/cover.png'),
+    description: 'A retreat story of identity fracture, social masks, and the person no one can quite locate.',
+    section: 'Imported Novels',
+    tags: ['identity', 'psychological thriller', 'retreat'],
+    totalChapters: theImposterContent.length,
+    content: theImposterContent,
+    initialStatus: 'want-to-read'
   },
   {
     id: 'structural-audit-pdf',

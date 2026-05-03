@@ -1,44 +1,93 @@
-The # 📖 How to Publish a New Novel
+# How to Add a New Novel
 
-Follow these steps to create a new website for a different book using this engine.
+Pocket Reader now supports multiple packaged novels in one app. Do not replace `src/features/reader/data.js` unless you are intentionally replacing *The Friction of the Spark*.
 
-## Step 1: Clone or Copy
-1.  If using GitHub Templates: Click **"Use this template"** to create a new repo.
-2.  If local: Copy the entire folder to a new location (e.g., `MyNewBook/`).
+## 1. Add the Book Cartridge
 
-## Step 2: Swap the Cartridge (Content)
-1.  Go to `src/features/reader/`.
-2.  Delete `data.js` (The old story).
-3.  Rename `data.sample.js` to `data.js`.
-4.  Open `data.js` and paste your new story content inside the JSON structure.
-    *   **Note**: Keep the connection `PocketReader.bookContent = [...]` matching the file.
+Create a new file under:
 
-## Step 3: Add Cover Image
-1.  Save your book cover image as **`cover.jpg`** (Optimized JPEG, must be named 'cover').
-2.  Replace the existing file in `src/assets/images/cover.jpg`.
-3.  **No code change needed** if you use this exact name.
+```text
+src/features/reader/books/<book-slug>.js
+```
 
-## Step 3: Update Metadata
-1.  Open `index.html`.
-2.  Change the `<title>` tag:
-    ```html
-    <title>My New Novel Title</title>
-    ```
-3.  (Optional) Change `<h3>Pocket Reader</h3>` in the drawer to your book title.
+Use the legacy cartridge shape:
 
-## Step 4: Password Protection (Optional)
-If you want to lock the content:
-1.  Open your browser console on the dev site.
-2.  Run the encryption snippet from `ENCRYPT_TOOL.js` with your chosen password.
-3.  Replace the `PocketReader.bookContent = [...]` block in `data.js` with the generated `PocketReader.encryptedContent = "..."` string.
-4.  The "Gatekeeper" will automatically detect the encrypted string and show the login screen.
+```js
+window.PocketReader = window.PocketReader || {};
+window.PocketReader.bookContent = [
+  {
+    chapter: 0,
+    isChapterStart: true,
+    title: 'COVER',
+    content: '<img src="src/assets/images/books/<book-slug>/cover.jpg" class="cover-img" alt="Book Cover">'
+  },
+  {
+    chapter: 1,
+    isChapterStart: true,
+    title: 'Chapter 1',
+    content: '<p>Your chapter text here.</p>'
+  }
+];
+PocketReader.bookContent = window.PocketReader.bookContent;
+```
 
-## Step 5: Publish
-1.  Initialize Git:
-    ```bash
-    git init
-    git add .
-    git commit -m "Initial commit of New Novel"
-    ```
-2.  Create a new GitHub Repository.
-3.  Push and enable GitHub Pages (Settings > Pages > source: main).
+For chunked books, set `isChapterStart: false` on continuation entries.
+
+## 2. Add the Cover
+
+Put the cover in a book-specific folder:
+
+```text
+src/assets/images/books/<book-slug>/cover.jpg
+```
+
+PNG is also fine. Use the exact path in the cartridge and in the library item.
+
+## 3. Wire the Cartridge
+
+Open `src/features/books/legacyCartridge.ts`.
+
+Add a raw import:
+
+```ts
+import myBookSource from '../reader/books/<book-slug>.js?raw';
+```
+
+Then export loaded content:
+
+```ts
+export const myBookContent = loadLegacyBookContent(myBookSource);
+```
+
+## 4. Register the Library Item
+
+Open `src/features/books/libraryData.ts`.
+
+Import the new content export and add a `LibraryItem` entry to `packagedLibrary`:
+
+```ts
+{
+  id: '<book-slug>',
+  type: 'book',
+  title: 'My Book Title',
+  author: 'Shiminize',
+  subtitle: 'Short genre label',
+  cover: assetUrlFor('src/assets/images/books/<book-slug>/cover.jpg'),
+  description: 'One clear sentence about the book.',
+  section: 'Imported Novels',
+  tags: ['tag one', 'tag two'],
+  totalChapters: myBookContent.length,
+  content: myBookContent,
+  initialStatus: 'want-to-read'
+}
+```
+
+## 5. Build and Check
+
+Run:
+
+```bash
+npm run build
+```
+
+Then open the app and confirm the book appears in Library, opens in Reader, and shows the correct cover.
