@@ -13,6 +13,7 @@
   border-radius: var(--radius-ui);
   color: var(--app-muted);
   background: var(--generated-color-rgba-255-255-255-0neg-64);
+  font-size: var(--text-control);
 }
 
 .collection-pill.active {

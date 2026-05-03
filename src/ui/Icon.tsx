@@ -1,12 +1,13 @@
 import type { LucideIcon, LucideProps } from 'lucide-react';
 import { cx } from './classes';
 
-export type AppIconSize = 'compact' | 'standard' | 'large';
+export type AppIconSize = 'compact' | 'standard' | 'large' | 'navigation';
 
-const appIconSizes: Record<AppIconSize, number> = {
-  compact: 14,
-  standard: 16,
-  large: 20
+const appIconSizes: Record<AppIconSize, string> = {
+  compact: 'var(--icon-size-compact)',
+  standard: 'var(--icon-size-standard)',
+  large: 'var(--icon-size-large)',
+  navigation: 'var(--icon-size-navigation)'
 };
 
 export interface AppIconProps extends Omit<LucideProps, 'size'> {

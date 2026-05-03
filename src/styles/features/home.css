@@ -45,9 +45,10 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--space-4);
-  padding: var(--space-4);
-  margin-bottom: var(--generated-length-26px);
+  gap: var(--space-3);
+  padding: var(--space-3);
+  margin-bottom: var(--space-5);
+  font-size: var(--text-control);
 }
 
 .goal-panel strong,
@@ -58,6 +59,16 @@
 .goal-panel span {
   color: var(--app-muted);
   margin-top: var(--space-1);
+}
+
+.goal-panel strong,
+.goal-panel span {
+  font-size: var(--text-control);
+  line-height: var(--line-compact);
+}
+
+.goal-panel .goal-controls {
+  gap: var(--space-1-5);
 }
 
 .goal-controls,
@@ -159,12 +170,12 @@
 .pick-card img {
   display: block;
   width: 100%;
-  aspect-ratio: 4 / 3;
+  aspect-ratio: 2 / 3;
   height: auto;
   object-fit: cover;
 }
 
-.pick-card span {
+.pick-card-content {
   min-width: 0;
   padding: var(--space-2-5);
 }
@@ -181,6 +192,13 @@
   font-size: var(--text-ui-sm);
   line-height: 1.25;
   overflow-wrap: anywhere;
+}
+
+.pick-card-marker {
+  display: flex;
+  align-items: center;
+  color: var(--action-primary-text);
+  margin-bottom: var(--space-1);
 }
 
 .cover-tile {
@@ -214,7 +232,7 @@
     gap: var(--space-2);
   }
 
-  .pick-card span {
+  .pick-card-content {
     padding: var(--space-2);
   }
 
@@ -262,12 +280,12 @@
 
   .home-top-picks-section .pick-card img {
     width: 100%;
-    aspect-ratio: 4 / 3;
+    aspect-ratio: 2 / 3;
     height: auto;
     min-height: 0;
   }
 
-  .home-top-picks-section .pick-card span {
+  .home-top-picks-section .pick-card-content {
     display: block;
   }
 }

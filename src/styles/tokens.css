@@ -245,6 +245,21 @@
   --target-md: 44px;
   --target-lg: 48px;
   --target-xl: 54px;
+  --target-xs: 32px;
+
+  --icon-size-compact: 10px;
+  --icon-size-standard: 12px;
+  --icon-size-large: 14px;
+  --icon-size-navigation: 18px;
+
+  --text-control: 0.75rem;
+  --text-navigation: 0.58rem;
+
+  --navigation-width: 336px;
+  --navigation-block-size: 52px;
+  --navigation-item-block-size: 40px;
+  --navigation-rail-width: 61px;
+  --navigation-shell-clearance: 74px;
 
   --shadow-soft: 0 10px 24px rgba(18, 22, 25, 0.08);
   --shadow-raised: 0 12px 28px rgba(18, 22, 25, 0.08);

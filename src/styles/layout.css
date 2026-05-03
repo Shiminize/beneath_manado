@@ -4,7 +4,7 @@
   background:
     linear-gradient(180deg, var(--surface-app-wash), transparent var(--generated-length-280px)),
     var(--app-bg);
-  padding-bottom: calc(var(--space-23) + var(--safe-bottom));
+  padding-bottom: calc(var(--navigation-shell-clearance) + var(--safe-bottom));
 }
 
 .screen {

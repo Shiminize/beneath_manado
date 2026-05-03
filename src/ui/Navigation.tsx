@@ -1,5 +1,6 @@
 import { Home, Library, Search } from 'lucide-react';
 import type { AppView } from '../app/types';
+import { AppIcon } from './Icon';
 
 interface NavigationProps {
   activeView: AppView;
@@ -23,7 +24,7 @@ export function Navigation({ activeView, onNavigate }: NavigationProps) {
           aria-current={activeView === view ? 'page' : undefined}
           onClick={() => onNavigate(view)}
         >
-          <Icon size={22} aria-hidden="true" />
+          <AppIcon icon={Icon} size="navigation" />
           <span>{label}</span>
         </button>
       ))}
