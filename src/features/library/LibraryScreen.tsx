@@ -1,7 +1,7 @@
 import { Check, FolderPlus, Grid2X2, List, Plus, Star } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import type { AppState, Collection, LibraryItem, ReadingStatus } from '../../app/types';
-import { ChipRail, IconButton } from '../../ui';
+import { AppIcon, ChipRail, IconButton } from '../../ui';
 
 interface LibraryScreenProps {
   items: LibraryItem[];
@@ -43,9 +43,12 @@ export function LibraryScreen({
           <p>{visibleItems.length} items</p>
         </div>
         <div className="header-actions">
-          <IconButton label={layout === 'grid' ? 'Show list' : 'Show grid'} variant="soft" onClick={() => setLayout(layout === 'grid' ? 'list' : 'grid')}>
-            {layout === 'grid' ? <List size={20} /> : <Grid2X2 size={20} />}
-          </IconButton>
+          <IconButton
+            label={layout === 'grid' ? 'Show list' : 'Show grid'}
+            icon={layout === 'grid' ? List : Grid2X2}
+            variant="soft"
+            onClick={() => setLayout(layout === 'grid' ? 'list' : 'grid')}
+          />
         </div>
       </header>
 
@@ -66,7 +69,7 @@ export function LibraryScreen({
           setNewCollectionName('');
         }}
       >
-        <FolderPlus size={18} aria-hidden="true" />
+        <AppIcon icon={FolderPlus} />
         <input
           aria-label="New collection name"
           name="new-collection-name"
@@ -74,9 +77,7 @@ export function LibraryScreen({
           onChange={(event) => setNewCollectionName(event.target.value)}
           placeholder="New collection"
         />
-        <IconButton label="Create collection" variant="soft" type="submit">
-          <Plus size={18} />
-        </IconButton>
+        <IconButton label="Create collection" icon={Plus} variant="soft" type="submit" />
       </form>
 
       <section className={layout === 'grid' ? 'library-grid' : 'library-list'} aria-label={activeCollection?.name || 'Library'}>
@@ -96,12 +97,22 @@ export function LibraryScreen({
                 <span>{state.progress[item.id]?.percent || 0}%</span>
               </div>
               <div className="library-actions">
-                <IconButton label="Mark want to read" variant="soft" onClick={() => onSetStatus(item.id, 'want-to-read')}>
-                  <Star size={18} />
-                </IconButton>
-                <IconButton label="Mark finished" variant="soft" onClick={() => onSetStatus(item.id, 'finished')}>
-                  <Check size={18} />
-                </IconButton>
+                <IconButton
+                  label="Mark want to read"
+                  icon={Star}
+                  iconSize="compact"
+                  size="compact"
+                  variant="soft"
+                  onClick={() => onSetStatus(item.id, 'want-to-read')}
+                />
+                <IconButton
+                  label="Mark finished"
+                  icon={Check}
+                  iconSize="compact"
+                  size="compact"
+                  variant="soft"
+                  onClick={() => onSetStatus(item.id, 'finished')}
+                />
                 {customCollections.length > 0 && (
                   <CollectionSelect
                     item={item}

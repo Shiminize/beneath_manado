@@ -1,5 +1,7 @@
+import type { LucideIcon } from 'lucide-react';
 import type { ButtonHTMLAttributes, ReactNode } from 'react';
 import { cx } from './classes';
+import { AppIcon, type AppIconSize } from './Icon';
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: ReactNode;
@@ -17,20 +19,23 @@ export function Button({ children, variant = 'plain', active = false, className,
 
 export interface IconButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   label: string;
-  children: ReactNode;
+  children?: ReactNode;
+  icon?: LucideIcon;
+  iconSize?: AppIconSize;
+  size?: 'compact' | 'standard';
   variant?: 'plain' | 'filled' | 'soft';
 }
 
-export function IconButton({ label, children, variant = 'plain', className, ...props }: IconButtonProps) {
+export function IconButton({ label, children, icon, iconSize = 'standard', size = 'standard', variant = 'plain', className, ...props }: IconButtonProps) {
   return (
     <button
-      className={cx('ui-icon-button', 'icon-button', `icon-button-${variant}`, className)}
+      className={cx('ui-icon-button', 'icon-button', `icon-button-${size}`, `icon-button-${variant}`, className)}
       type="button"
       aria-label={label}
       title={label}
       {...props}
     >
-      {children}
+      {icon ? <AppIcon icon={icon} size={iconSize} /> : children}
     </button>
   );
 }

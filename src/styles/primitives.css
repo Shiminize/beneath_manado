@@ -75,10 +75,15 @@
   color: var(--app-muted);
 }
 
+.app-icon {
+  display: block;
+  flex: 0 0 auto;
+}
+
 .icon-button {
-  width: var(--space-11);
-  min-width: var(--space-11);
-  height: var(--space-11);
+  width: var(--icon-button-target, var(--target-md));
+  min-width: var(--icon-button-target, var(--target-md));
+  height: var(--icon-button-target, var(--target-md));
   border: 0;
   border-radius: var(--radius-ui);
   display: inline-flex;
@@ -90,6 +95,14 @@
     background-color var(--reader-motion-duration-short) var(--reader-motion-ease-standard),
     color var(--reader-motion-duration-short) var(--reader-motion-ease-standard),
     opacity var(--reader-motion-duration-short) var(--reader-motion-ease-standard);
+}
+
+.icon-button-compact {
+  --icon-button-target: var(--target-sm);
+}
+
+.icon-button-standard {
+  --icon-button-target: var(--target-md);
 }
 
 .icon-button:disabled {
