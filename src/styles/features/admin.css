@@ -69,6 +69,10 @@
   color: var(--app-muted);
 }
 
+.admin-access-disabled {
+  color: var(--app-muted);
+}
+
 .admin-metric strong {
   font-size: var(--text-heading-sm);
 }

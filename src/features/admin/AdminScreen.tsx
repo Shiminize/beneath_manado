@@ -110,7 +110,11 @@ export function AdminScreen() {
     const payload = await response.json().catch(() => ({}));
 
     if (!response.ok) {
-      setMessage(payload.error || 'Unable to update book access.');
+      setMessage(
+        payload.error === 'database_not_configured'
+          ? 'Database required before password changes can be saved.'
+          : payload.error || 'Unable to update book access.'
+      );
       return;
     }
 
@@ -211,7 +215,7 @@ function AnalyticsView({
 
       <section className="admin-grid" aria-label="Book access and views">
         {snapshot.books.map((book) => (
-          <BookAccessRow key={book.id} book={book} onUpdate={onUpdateBookAccess} />
+          <BookAccessRow key={book.id} book={book} canManageAccess={snapshot.setup.hasDatabase} onUpdate={onUpdateBookAccess} />
         ))}
       </section>
 
@@ -242,11 +246,20 @@ function Metric({ label, value }: { label: string; value: number }) {
   );
 }
 
-function BookAccessRow({ book, onUpdate }: { book: AdminBook; onUpdate: (bookId: string, locked: boolean, password: string) => Promise<void> }) {
+function BookAccessRow({
+  book,
+  canManageAccess,
+  onUpdate
+}: {
+  book: AdminBook;
+  canManageAccess: boolean;
+  onUpdate: (bookId: string, locked: boolean, password: string) => Promise<void>;
+}) {
   const [password, setPassword] = useState('');
   const [saving, setSaving] = useState(false);
 
   async function handleUpdate(locked: boolean) {
+    if (!canManageAccess) return;
     setSaving(true);
     await onUpdate(book.id, locked, password);
     setPassword('');
@@ -259,22 +272,29 @@ function BookAccessRow({ book, onUpdate }: { book: AdminBook; onUpdate: (bookId:
         <strong>{book.title}</strong>
         <span>{book.locked ? 'Password protected' : 'Public'}{book.hasPassword ? ' · password saved' : ''}</span>
         <small>{book.views} views · {book.sessions} sessions · {book.maxPercent}% max depth</small>
+        {!canManageAccess && <small className="admin-access-disabled">Database required before lock settings can be saved.</small>}
       </div>
       <input
         aria-label={`New password for ${book.title}`}
         autoComplete="new-password"
+        disabled={!canManageAccess}
         id={`book-password-${book.id}`}
         name={`book-password-${book.id}`}
         value={password}
         onChange={(event) => setPassword(event.target.value)}
-        placeholder="New password"
+        placeholder={canManageAccess ? 'New password' : 'Database required'}
         type="password"
       />
-      <Button type="button" variant="soft" disabled={saving} onClick={() => void handleUpdate(false)}>
+      <Button type="button" variant="soft" disabled={saving || !canManageAccess} onClick={() => void handleUpdate(false)}>
         <AppIcon icon={UnlockKeyhole} size="standard" />
         Public
       </Button>
-      <Button type="button" variant="filled" disabled={saving || (!book.hasPassword && password.length < 8)} onClick={() => void handleUpdate(true)}>
+      <Button
+        type="button"
+        variant="filled"
+        disabled={!canManageAccess || saving || (!book.hasPassword && password.length < 8)}
+        onClick={() => void handleUpdate(true)}
+      >
         <AppIcon icon={LockKeyhole} size="standard" />
         Lock
       </Button>
