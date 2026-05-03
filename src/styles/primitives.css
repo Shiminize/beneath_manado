@@ -80,6 +80,48 @@
   flex: 0 0 auto;
 }
 
+.book-cover {
+  display: block;
+  position: relative;
+  width: 100%;
+  border-radius: var(--radius-ui-sm);
+  background: var(--app-subtle);
+  box-shadow: var(--book-cover-shadow, var(--shadow-book-cover));
+  isolation: isolate;
+}
+
+.book-cover img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  object-fit: cover;
+  border-radius: inherit;
+}
+
+.book-cover::before,
+.book-cover::after {
+  content: '';
+  position: absolute;
+  pointer-events: none;
+}
+
+.book-cover::before {
+  inset: var(--space-0);
+  border-radius: inherit;
+  box-shadow: var(--shadow-book-cover-inset);
+  z-index: var(--z-book-cover-overlay);
+}
+
+.book-cover::after {
+  top: var(--space-0);
+  bottom: var(--space-0);
+  left: var(--space-0);
+  width: var(--space-1);
+  border-radius: var(--radius-ui-sm) var(--radius-ui-none) var(--radius-ui-none) var(--radius-ui-sm);
+  background: var(--book-cover-spine-sheen);
+  z-index: var(--z-book-cover-overlay);
+}
+
 .icon-button {
   width: var(--icon-button-target, var(--target-md));
   min-width: var(--icon-button-target, var(--target-md));

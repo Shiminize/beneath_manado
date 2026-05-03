@@ -126,21 +126,15 @@
   scroll-snap-align: start;
 }
 
-.continue-card img,
-.cover-tile img {
-  display: block;
-  width: 100%;
-  aspect-ratio: 2 / 3;
-  object-fit: cover;
-  border-radius: var(--radius-ui-sm);
-  background: var(--app-subtle);
+.continue-card .book-cover {
+  --book-cover-shadow: var(--shadow-book-cover-compact);
 }
 
 .continue-card strong,
 .continue-card small,
 .pick-card strong,
 .pick-card small,
-.cover-tile span {
+.cover-tile-title {
   display: block;
 }
 
@@ -160,24 +154,17 @@
   display: grid;
   grid-template-rows: auto 1fr;
   align-content: start;
-  overflow: hidden;
   border-radius: var(--radius-ui);
-  background: var(--app-accent);
-  color: var(--action-primary-text);
-  box-shadow: var(--generated-shadow-var-neg-neg-appneg-shadow);
+  color: var(--app-ink);
 }
 
-.pick-card img {
-  display: block;
-  width: 100%;
-  aspect-ratio: 2 / 3;
-  height: auto;
-  object-fit: cover;
+.pick-card .book-cover {
+  --book-cover-shadow: var(--shadow-book-cover);
 }
 
 .pick-card-content {
   min-width: 0;
-  padding: var(--space-2-5);
+  padding: var(--space-2-5) var(--space-0-5) var(--space-0);
 }
 
 .pick-card strong {
@@ -188,26 +175,37 @@
 
 .pick-card small {
   margin-top: var(--space-1);
-  color: var(--action-primary-text);
+  color: var(--app-muted);
   font-size: var(--text-ui-sm);
   line-height: 1.25;
   overflow-wrap: anywhere;
 }
 
 .pick-card-marker {
-  display: flex;
+  min-height: var(--space-5);
+  width: max-content;
+  display: inline-flex;
   align-items: center;
+  justify-content: center;
+  padding: var(--space-0-5) var(--space-2);
+  border-radius: var(--radius-pill);
+  background: var(--app-accent);
   color: var(--action-primary-text);
   margin-bottom: var(--space-1);
+  box-shadow: var(--shadow-book-cover-compact);
 }
 
 .cover-tile {
   width: var(--generated-length-126px);
   flex: 0 0 var(--generated-length-126px);
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  padding: var(--space-0);
   scroll-snap-align: start;
 }
 
-.cover-tile span {
+.cover-tile-title {
   margin-top: var(--space-2);
   font-size: var(--text-ui-lg);
   line-height: 1.25;
@@ -276,13 +274,6 @@
   .home-top-picks-section .pick-card {
     display: grid;
     grid-template-columns: 1fr;
-  }
-
-  .home-top-picks-section .pick-card img {
-    width: 100%;
-    aspect-ratio: 2 / 3;
-    height: auto;
-    min-height: 0;
   }
 
   .home-top-picks-section .pick-card-content {

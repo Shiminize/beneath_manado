@@ -266,6 +266,10 @@
   --shadow-float: 0 18px 38px rgba(18, 22, 25, 0.14);
   --shadow-button-soft: 0 8px 18px rgba(18, 22, 25, 0.08);
   --shadow-button-filled: 0 10px 24px rgba(18, 22, 25, 0.12);
+  --shadow-book-cover: 0 18px 34px rgba(18, 22, 25, 0.28);
+  --shadow-book-cover-compact: 0 10px 18px rgba(18, 22, 25, 0.22);
+  --shadow-book-cover-inset: inset 1px 0 0 rgba(255, 255, 255, 0.36), inset -1px 0 0 rgba(0, 0, 0, 0.18);
+  --book-cover-spine-sheen: linear-gradient(90deg, rgba(255, 255, 255, 0.34), rgba(0, 0, 0, 0.18));
   --shadow-reader-soft: 0 16px 40px rgba(18, 22, 25, 0.08);
   --shadow-reader-cover: 0 18px 44px rgba(18, 22, 25, 0.24);
   --shadow-sheet: 0 -18px 42px rgba(18, 22, 25, 0.18);
@@ -299,6 +303,7 @@
   --weight-reader-bold: 700;
 
   --z-line-guide: 6;
+  --z-book-cover-overlay: 7;
   --z-reader-chrome: 12;
   --z-line-guide-controls: 18;
   --z-line-guide-menu: 19;

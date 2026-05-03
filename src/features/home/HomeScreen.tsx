@@ -1,7 +1,7 @@
 import { BookOpen, ChevronRight, Minus, Plus, Star } from 'lucide-react';
 import type { AppState, LibraryItem, ReadingProgress, Suggestion } from '../../app/types';
 import { stripHtml } from '../reader/pagination';
-import { AppIcon, IconButton } from '../../ui';
+import { AppIcon, BookCover, IconButton } from '../../ui';
 
 interface HomeScreenProps {
   items: LibraryItem[];
@@ -52,7 +52,7 @@ export function HomeScreen({ items, state, suggestions, onOpenItem, onNavigateLi
         <div className="continue-rail">
           {continueItems.map((item) => (
             <button key={item.id} type="button" className="continue-card" onClick={() => onOpenItem(item.id)}>
-              <img src={item.cover} alt="" loading="lazy" />
+              <BookCover src={item.cover} />
               <span>
                 <strong>{item.title}</strong>
                 <small>{item.author}</small>
@@ -73,7 +73,7 @@ export function HomeScreen({ items, state, suggestions, onOpenItem, onNavigateLi
 
             return (
               <button key={suggestion.itemId} type="button" className="pick-card" aria-label={`Open ${item.title}`} onClick={() => onOpenItem(suggestion.itemId)}>
-                <img src={item.cover} alt="" loading="lazy" />
+                <BookCover src={item.cover} />
                 <span className="pick-card-content">
                   {markedWantToRead ? (
                     <span className="pick-card-marker" aria-label={suggestion.reason}>
@@ -103,8 +103,8 @@ export function HomeScreen({ items, state, suggestions, onOpenItem, onNavigateLi
         <div className="cover-row">
           {wantItems.map((item) => (
             <button key={item.id} type="button" className="cover-tile" onClick={() => onOpenItem(item.id)}>
-              <img src={item.cover} alt="" loading="lazy" />
-              <span>{item.title}</span>
+              <BookCover src={item.cover} />
+              <span className="cover-tile-title">{item.title}</span>
             </button>
           ))}
         </div>

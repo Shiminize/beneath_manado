@@ -1,7 +1,7 @@
 import { Check, FolderPlus, Grid2X2, List, Plus, Star } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import type { AppState, Collection, LibraryItem, ReadingStatus } from '../../app/types';
-import { AppIcon, ChipRail, IconButton } from '../../ui';
+import { AppIcon, BookCover, ChipRail, IconButton } from '../../ui';
 
 interface LibraryScreenProps {
   items: LibraryItem[];
@@ -84,7 +84,7 @@ export function LibraryScreen({
         {visibleItems.map((item) => (
           <article key={item.id} className="library-card">
             <button type="button" className="library-cover-button" aria-label={`Open ${item.title}`} onClick={() => onOpenItem(item.id)}>
-              <img src={item.cover} alt="" loading="lazy" />
+              <BookCover src={item.cover} />
             </button>
             <div className="library-card-body">
               <button type="button" className="library-title-button" onClick={() => onOpenItem(item.id)}>

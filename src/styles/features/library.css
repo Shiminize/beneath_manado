@@ -74,13 +74,8 @@
   min-width: 0;
 }
 
-.library-card img {
-  display: block;
-  width: 100%;
-  aspect-ratio: 2 / 3;
-  object-fit: cover;
-  border-radius: var(--radius-ui-sm);
-  background: var(--app-subtle);
+.library-card .book-cover {
+  --book-cover-shadow: var(--shadow-book-cover-compact);
 }
 
 .library-cover-button {
@@ -177,10 +172,6 @@
     grid-template-columns: var(--space-18-5) minmax(0, 1fr);
     gap: var(--space-2);
     padding: var(--space-2);
-  }
-
-  .library-grid .library-card img {
-    aspect-ratio: 2 / 3;
   }
 
   .library-grid .library-title-button strong {

@@ -1,3 +1,4 @@
+export { BookCover } from './BookCover';
 export { Button, IconButton } from './Button';
 export { Card } from './Card';
 export { ChipRail } from './ChipRail';
