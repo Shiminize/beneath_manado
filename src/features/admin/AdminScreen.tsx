@@ -263,6 +263,8 @@ function BookAccessRow({ book, onUpdate }: { book: AdminBook; onUpdate: (bookId:
       <input
         aria-label={`New password for ${book.title}`}
         autoComplete="new-password"
+        id={`book-password-${book.id}`}
+        name={`book-password-${book.id}`}
         value={password}
         onChange={(event) => setPassword(event.target.value)}
         placeholder="New password"
