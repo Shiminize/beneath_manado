@@ -1,5 +1,11 @@
 .screen-admin {
   padding-bottom: var(--space-8);
+  --admin-public-tone: var(--app-accent);
+  --admin-locked-tone: var(--app-accent-strong);
+  --admin-password-tone: var(--app-cyan);
+  --admin-status-soft: color-mix(in oklab, var(--app-accent) 12%, transparent);
+  --admin-locked-soft: color-mix(in oklab, var(--app-accent-strong) 12%, transparent);
+  --admin-password-soft: color-mix(in oklab, var(--app-cyan) 12%, transparent);
 }
 
 .admin-header {
@@ -8,7 +14,7 @@
 
 .admin-login,
 .admin-setup,
-.admin-toolbar,
+.admin-command-panel,
 .admin-metric,
 .admin-book-row,
 .admin-event {
@@ -28,6 +34,14 @@
   margin: var(--space-0);
 }
 
+.admin-eyebrow {
+  color: var(--app-muted);
+  font-size: var(--text-ui-sm);
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
 .admin-setup {
   display: grid;
   gap: var(--space-2);
@@ -35,16 +49,81 @@
   padding: var(--space-4);
 }
 
-.admin-toolbar {
-  display: flex;
-  justify-content: flex-end;
+.admin-command-panel {
+  display: grid;
+  gap: var(--space-4);
   margin-bottom: var(--space-4);
-  padding: var(--space-3);
+  padding: var(--space-4);
 }
 
-.admin-toolbar label {
+.admin-command-copy {
+  display: grid;
+  gap: var(--space-1-5);
+}
+
+.admin-command-copy h2,
+.admin-command-copy p {
+  margin: var(--space-0);
+}
+
+.admin-command-copy h2 {
+  font-size: var(--text-heading-sm);
+  line-height: var(--line-heading);
+}
+
+.admin-command-copy p {
+  color: var(--app-muted);
+  font-size: var(--text-ui-lg);
+}
+
+.admin-access-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(var(--space-0), 1fr));
+  gap: var(--space-2);
+}
+
+.admin-access-chip {
+  display: grid;
+  grid-template-columns: var(--space-5) 1fr;
+  gap: var(--space-1) var(--space-2);
+  align-items: center;
+  min-height: var(--target-lg);
+  padding: var(--space-2-5);
+  border-radius: var(--radius-ui);
+  background: var(--surface-panel-soft);
+  color: var(--app-ink);
+}
+
+.admin-access-chip svg {
+  grid-row: span 2;
+}
+
+.admin-access-chip span {
+  color: var(--app-muted);
+  font-size: var(--text-ui-sm);
+}
+
+.admin-access-chip strong {
+  font-size: var(--text-heading-sm);
+  line-height: var(--line-tight);
+}
+
+.admin-access-chip-public {
+  background: var(--admin-status-soft);
+}
+
+.admin-access-chip-locked {
+  background: var(--admin-locked-soft);
+}
+
+.admin-access-chip-password {
+  background: var(--admin-password-soft);
+}
+
+.admin-range-control {
   display: grid;
   gap: var(--space-1);
+  align-content: start;
   color: var(--app-muted);
   font-size: var(--text-ui-sm);
 }
@@ -63,7 +142,6 @@
 }
 
 .admin-metric span,
-.admin-book-row span,
 .admin-event span,
 .admin-event small {
   color: var(--app-muted);
@@ -84,15 +162,146 @@
 }
 
 .admin-book-row {
+  position: relative;
   display: grid;
   grid-template-columns: 1fr;
-  gap: var(--space-3);
+  gap: var(--space-4);
   padding: var(--space-4);
+  overflow: hidden;
 }
 
-.admin-book-row > div {
+.admin-book-row::before {
+  content: '';
+  position: absolute;
+  inset: var(--space-0) auto var(--space-0) var(--space-0);
+  width: var(--space-1);
+  background: var(--admin-public-tone);
+}
+
+.admin-book-row.is-locked::before {
+  background: var(--admin-locked-tone);
+}
+
+.admin-book-main,
+.admin-book-heading,
+.admin-password-control,
+.admin-password-control label {
   display: grid;
+}
+
+.admin-book-main {
+  gap: var(--space-2);
+  min-width: var(--space-0);
+}
+
+.admin-book-heading {
+  gap: var(--space-2);
+}
+
+.admin-book-heading > strong {
+  font-size: var(--text-ui-lg);
+  line-height: var(--line-card);
+}
+
+.admin-status-badge {
+  display: inline-grid;
+  grid-template-columns: var(--space-5) auto;
+  gap: var(--space-0-5) var(--space-1-5);
+  align-items: center;
+  width: fit-content;
+  padding: var(--space-1-5) var(--space-2);
+  border-radius: var(--radius-pill);
+  background: var(--admin-status-soft);
+  color: var(--app-ink);
+  font-size: var(--text-ui-sm);
+  font-weight: 700;
+}
+
+.admin-status-badge.is-locked {
+  background: var(--admin-locked-soft);
+}
+
+.admin-status-badge svg {
+  grid-row: span 2;
+}
+
+.admin-status-badge small {
+  grid-column: 2;
+  color: var(--app-muted);
+  font-size: var(--text-ui-xs);
+  font-weight: 600;
+}
+
+.admin-book-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1-5) var(--space-3);
+  color: var(--app-muted);
+  font-size: var(--text-ui-sm);
+}
+
+.admin-book-stats span {
+  display: inline-flex;
+  align-items: center;
   gap: var(--space-1);
+}
+
+.admin-depth-bar {
+  --admin-progress: 0%;
+  height: var(--space-1-5);
+  overflow: hidden;
+  border-radius: var(--radius-pill);
+  background: var(--surface-chip);
+}
+
+.admin-depth-bar span {
+  display: block;
+  width: var(--admin-progress);
+  height: 100%;
+  border-radius: inherit;
+  background: var(--app-accent);
+}
+
+.admin-password-control {
+  gap: var(--space-2);
+  min-width: var(--space-0);
+}
+
+.admin-password-control label {
+  gap: var(--space-1);
+}
+
+.admin-password-control label span {
+  color: var(--app-muted);
+  font-size: var(--text-ui-sm);
+}
+
+.admin-password-control label strong {
+  font-size: var(--text-ui-md);
+}
+
+.admin-password-control small {
+  color: var(--app-muted);
+  font-size: var(--text-ui-sm);
+  line-height: var(--line-compact);
+}
+
+.admin-access-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(var(--space-0), 1fr));
+  gap: var(--space-2);
+  align-items: center;
+  align-self: center;
+}
+
+.admin-access-actions .ui-button {
+  width: 100%;
+  min-height: var(--target-md);
+}
+
+.screen-admin .ui-button:disabled {
+  cursor: default;
+  opacity: 0.42;
 }
 
 .admin-events {
@@ -111,12 +320,26 @@
 }
 
 @media (min-width: 700px) {
+  .admin-command-panel {
+    grid-template-columns: minmax(var(--space-0), 1fr) minmax(var(--generated-length-280px), auto) auto;
+    align-items: center;
+  }
+
   .admin-metrics {
     grid-template-columns: repeat(4, 1fr);
   }
 
   .admin-book-row {
-    grid-template-columns: 1fr minmax(var(--generated-length-188px), var(--generated-length-280px)) auto auto;
+    grid-template-columns: minmax(var(--space-0), 1fr) minmax(var(--generated-length-280px), var(--generated-length-420px)) auto;
     align-items: center;
+  }
+
+  .admin-book-heading {
+    grid-template-columns: minmax(var(--space-0), 1fr) auto;
+    align-items: start;
+  }
+
+  .admin-access-actions {
+    min-width: var(--generated-length-188px);
   }
 }

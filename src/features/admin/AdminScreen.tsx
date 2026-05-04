@@ -1,6 +1,9 @@
-import { FormEvent, useEffect, useState } from 'react';
-import { LockKeyhole, RefreshCw, UnlockKeyhole } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import type { CSSProperties, FormEvent } from 'react';
+import { Activity, Eye, Globe2, KeyRound, LockKeyhole, RefreshCw, ShieldCheck, UnlockKeyhole } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import { AppIcon, Button } from '../../ui';
+import { cx } from '../../ui/classes';
 
 type SetupStatus = {
   hasDatabase: boolean;
@@ -185,18 +188,16 @@ export function AdminScreen() {
           {message && <div className="admin-message">{message}</div>}
           {snapshot?.setup && <SetupPanel setup={snapshot.setup} setupRequired={snapshot.setupRequired} />}
 
-          <section className="admin-toolbar" aria-label="Analytics filters">
-            <label>
-              Range
-              <select id="admin-range" name="admin-range" value={range} onChange={(event) => setRange(event.target.value)}>
-                <option value="7d">7 days</option>
-                <option value="30d">30 days</option>
-                <option value="90d">90 days</option>
-              </select>
-            </label>
-          </section>
-
-          {loading ? <p>Loading analytics.</p> : snapshot && <AnalyticsView snapshot={snapshot} onUpdateBookAccess={updateBookAccess} />}
+          {loading ? (
+            <p>Loading analytics.</p>
+          ) : snapshot && (
+            <AnalyticsView
+              snapshot={snapshot}
+              range={range}
+              onRangeChange={setRange}
+              onUpdateBookAccess={updateBookAccess}
+            />
+          )}
         </>
       )}
     </main>
@@ -230,13 +231,45 @@ function SetupPanel({ setup, setupRequired }: { setup: SetupStatus; setupRequire
 
 function AnalyticsView({
   snapshot,
+  range,
+  onRangeChange,
   onUpdateBookAccess
 }: {
   snapshot: AnalyticsSnapshot;
+  range: string;
+  onRangeChange: (range: string) => void;
   onUpdateBookAccess: (bookId: string, locked: boolean, password: string) => Promise<void>;
 }) {
+  const totalBooks = snapshot.books.length;
+  const lockedBooks = snapshot.books.filter((book) => book.locked).length;
+  const publicBooks = totalBooks - lockedBooks;
+  const passwordSavedBooks = snapshot.books.filter((book) => book.hasPassword).length;
+
   return (
     <>
+      <section className="admin-command-panel" aria-label="Access control overview">
+        <div className="admin-command-copy">
+          <span className="admin-eyebrow">Access control</span>
+          <h2>Book visibility</h2>
+          <p>{lockedBooks} locked, {publicBooks} public, {passwordSavedBooks} with saved passwords.</p>
+        </div>
+
+        <div className="admin-access-summary" aria-label="Book access totals">
+          <AccessSummary icon={Globe2} label="Public" value={publicBooks} tone="public" />
+          <AccessSummary icon={ShieldCheck} label="Locked" value={lockedBooks} tone="locked" />
+          <AccessSummary icon={KeyRound} label="Passwords" value={passwordSavedBooks} tone="password" />
+        </div>
+
+        <label className="admin-range-control">
+          Range
+          <select id="admin-range" name="admin-range" value={range} onChange={(event) => onRangeChange(event.target.value)}>
+            <option value="7d">7 days</option>
+            <option value="30d">30 days</option>
+            <option value="90d">90 days</option>
+          </select>
+        </label>
+      </section>
+
       <section className="admin-metrics" aria-label="Analytics totals">
         <Metric label="Views" value={snapshot.totals.views} />
         <Metric label="Sessions" value={snapshot.totals.sessions} />
@@ -265,6 +298,26 @@ function AnalyticsView({
         )}
       </section>
     </>
+  );
+}
+
+function AccessSummary({
+  icon,
+  label,
+  value,
+  tone
+}: {
+  icon: LucideIcon;
+  label: string;
+  value: number;
+  tone: 'public' | 'locked' | 'password';
+}) {
+  return (
+    <article className={cx('admin-access-chip', `admin-access-chip-${tone}`)}>
+      <AppIcon icon={icon} size="standard" />
+      <span>{label}</span>
+      <strong>{value}</strong>
+    </article>
   );
 }
 
@@ -297,38 +350,109 @@ function BookAccessRow({
     setSaving(false);
   }
 
+  const lockActionLabel = book.locked ? 'Update' : 'Lock';
+  const passwordCopy = getBookPasswordCopy(book, password);
+
   return (
-    <article className="admin-book-row">
-      <div>
-        <strong>{book.title}</strong>
-        <span>{book.locked ? 'Password protected' : 'Public'}{book.hasPassword ? ' · password saved' : ''}</span>
-        <small>{book.views} views · {book.sessions} sessions · {book.maxPercent}% max depth</small>
+    <article className={cx('admin-book-row', book.locked ? 'is-locked' : 'is-public')}>
+      <div className="admin-book-main">
+        <div className="admin-book-heading">
+          <strong>{book.title}</strong>
+          <BookStatusBadge book={book} />
+        </div>
+        <div className="admin-book-stats" aria-label={`${book.title} analytics`}>
+          <span><AppIcon icon={Eye} size="compact" />{book.views} views</span>
+          <span><AppIcon icon={Activity} size="compact" />{book.sessions} sessions</span>
+          <span>{book.maxPercent}% max depth</span>
+        </div>
+        <div className="admin-depth-bar" aria-label={`${book.maxPercent}% max read depth`}>
+          <span style={getProgressStyle(book.maxPercent)} />
+        </div>
         {!canManageAccess && <small className="admin-access-disabled">Database required before lock settings can be saved.</small>}
       </div>
-      <input
-        aria-label={`New password for ${book.title}`}
-        autoComplete="new-password"
-        disabled={!canManageAccess}
-        id={`book-password-${book.id}`}
-        name={`book-password-${book.id}`}
-        value={password}
-        onChange={(event) => setPassword(event.target.value)}
-        placeholder={canManageAccess ? 'New password' : 'Database required'}
-        type="password"
-      />
-      <Button type="button" variant="soft" disabled={saving || !canManageAccess} onClick={() => void handleUpdate(false)}>
-        <AppIcon icon={UnlockKeyhole} size="standard" />
-        Public
-      </Button>
-      <Button
-        type="button"
-        variant="filled"
-        disabled={!canManageAccess || saving || (!book.hasPassword && password.length < 8)}
-        onClick={() => void handleUpdate(true)}
-      >
-        <AppIcon icon={LockKeyhole} size="standard" />
-        Lock
-      </Button>
+
+      <div className="admin-password-control">
+        <label htmlFor={`book-password-${book.id}`}>
+          <span>{passwordCopy.label}</span>
+          <strong>{passwordCopy.value}</strong>
+        </label>
+        <input
+          aria-label={`Visible password reset for ${book.title}`}
+          autoComplete="off"
+          disabled={!canManageAccess}
+          id={`book-password-${book.id}`}
+          name={`book-password-${book.id}`}
+          value={password}
+          onChange={(event) => setPassword(event.target.value)}
+          placeholder={canManageAccess ? 'Type visible password reset' : 'Database required'}
+          type="text"
+        />
+        <small>{passwordCopy.helper}</small>
+      </div>
+
+      <div className="admin-access-actions" aria-label={`${book.title} access actions`}>
+        <Button
+          type="button"
+          variant={book.locked ? 'soft' : 'filled'}
+          disabled={saving || !canManageAccess}
+          onClick={() => void handleUpdate(false)}
+        >
+          <AppIcon icon={UnlockKeyhole} size="standard" />
+          Public
+        </Button>
+        <Button
+          type="button"
+          variant={book.locked ? 'filled' : 'soft'}
+          disabled={!canManageAccess || saving || (!book.hasPassword && password.length < 8)}
+          onClick={() => void handleUpdate(true)}
+        >
+          <AppIcon icon={LockKeyhole} size="standard" />
+          {lockActionLabel}
+        </Button>
+      </div>
     </article>
   );
+}
+
+function BookStatusBadge({ book }: { book: AdminBook }) {
+  const Icon = book.locked ? ShieldCheck : Globe2;
+  const label = book.locked ? 'Locked' : 'Public';
+  const detail = book.locked ? (book.hasPassword ? 'Password required' : 'Needs password') : 'Readable now';
+
+  return (
+    <span className={cx('admin-status-badge', book.locked ? 'is-locked' : 'is-public')}>
+      <AppIcon icon={Icon} size="standard" />
+      <span>{label}</span>
+      <small>{detail}</small>
+    </span>
+  );
+}
+
+function getBookPasswordCopy(book: AdminBook, draftPassword: string) {
+  if (draftPassword) {
+    return {
+      label: 'New visible password',
+      value: draftPassword,
+      helper: 'This password is visible while editing and will be hashed when saved.'
+    };
+  }
+
+  if (book.hasPassword) {
+    return {
+      label: 'Stored password',
+      value: 'Secure hash saved',
+      helper: 'Existing passwords are not reversible. Type a reset password to change it.'
+    };
+  }
+
+  return {
+    label: 'Stored password',
+    value: 'No password set',
+    helper: 'Type at least 8 characters, then lock the book.'
+  };
+}
+
+function getProgressStyle(maxPercent: number): CSSProperties {
+  const boundedPercent = Math.min(100, Math.max(0, maxPercent));
+  return { '--admin-progress': `${boundedPercent}%` } as CSSProperties;
 }

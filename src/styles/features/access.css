@@ -32,10 +32,10 @@
 
 .access-form input,
 .admin-login input,
-.admin-book-row input,
-.admin-toolbar select {
+.admin-password-control input,
+.admin-range-control select {
   min-height: var(--target-md);
-  border: var(--generated-length-1px) solid var(--app-border);
+  border: var(--generated-length-1px) solid var(--border-subtle);
   border-radius: var(--radius-ui);
   padding: var(--space-3);
   background: var(--surface-field);
