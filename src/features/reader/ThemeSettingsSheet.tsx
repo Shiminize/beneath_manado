@@ -18,6 +18,7 @@ const themes: { value: ReaderTheme; label: string }[] = [
 ];
 
 const colorPalettes: { value: ColorPalette; label: string; description: string }[] = [
+  { value: 'parchment', label: 'Warm Parchment', description: 'Cozy amber warmth' },
   { value: 'sage', label: 'Digital Sage', description: 'Soft library green' },
   { value: 'oxide', label: 'Sepia Oxide', description: 'Warm literary sepia' },
   { value: 'noir', label: 'Ink Pearl', description: 'Clean product neutral' },

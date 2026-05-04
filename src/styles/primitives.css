@@ -45,7 +45,7 @@
 }
 
 .ui-button-chip {
-  border-radius: var(--radius-ui);
+  border-radius: var(--radius-pill);
   color: var(--app-muted);
   background: var(--surface-chip);
 }

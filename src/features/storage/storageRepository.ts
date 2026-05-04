@@ -14,7 +14,7 @@ import type {
 const STORAGE_KEY = 'friction-reader-state-v1';
 const STATE_VERSION = 1;
 const readerFontFamilies = new Set<ReaderFontFamily>(['theme', 'literata', 'source-serif', 'atkinson', 'georgia', 'palatino']);
-const colorPalettes = new Set<ColorPalette>(['sage', 'oxide', 'noir', 'rose', 'dusk', 'marine']);
+const colorPalettes = new Set<ColorPalette>(['sage', 'oxide', 'noir', 'rose', 'dusk', 'marine', 'parchment']);
 const pageTurnModes = new Set<PageTurnMode>(['fade', 'scroll']);
 
 interface StoredState {
@@ -24,7 +24,7 @@ interface StoredState {
 
 export const defaultPreferences: ReaderPreferences = {
   theme: 'original',
-  colorPalette: 'sage',
+  colorPalette: 'parchment',
   fontSize: 18,
   fontFamily: 'palatino',
   boldText: false,

@@ -16,6 +16,7 @@
     "test:watch": "vitest"
   },
   "dependencies": {
+    "@fontsource-variable/dm-sans": "^5.2.8",
     "@fontsource-variable/literata": "^5.2.8",
     "@fontsource-variable/source-serif-4": "^5.2.9",
     "@fontsource/atkinson-hyperlegible": "^5.2.8",

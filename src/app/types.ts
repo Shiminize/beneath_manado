@@ -6,7 +6,7 @@ export type ReadingStatus = 'reading' | 'want-to-read' | 'finished' | 'new';
 
 export type ReaderTheme = 'original' | 'quiet' | 'paper' | 'bold' | 'calm' | 'focus';
 
-export type ColorPalette = 'sage' | 'oxide' | 'noir' | 'rose' | 'dusk' | 'marine';
+export type ColorPalette = 'sage' | 'oxide' | 'noir' | 'rose' | 'dusk' | 'marine' | 'parchment';
 
 export type PageTurnMode = 'curl' | 'fade' | 'scroll';
 

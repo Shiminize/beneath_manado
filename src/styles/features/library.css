@@ -10,7 +10,7 @@
   white-space: nowrap;
   min-height: var(--space-10);
   padding: 0 var(--space-3-5);
-  border-radius: var(--radius-ui);
+  border-radius: var(--radius-pill);
   color: var(--app-muted);
   background: var(--generated-color-rgba-255-255-255-0neg-64);
   font-size: var(--text-control);
@@ -59,7 +59,7 @@
   display: grid;
   grid-template-columns: var(--space-23) 1fr;
   gap: var(--space-3);
-  padding: var(--space-2-5);
+  padding: var(--space-4);
   border-radius: var(--radius-ui);
   background: var(--surface-panel-soft);
   box-shadow: var(--shadow-raised);

@@ -46,8 +46,8 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--space-3);
-  padding: var(--space-3);
-  margin-bottom: var(--space-5);
+  padding: var(--space-4) var(--space-5);
+  margin-bottom: var(--space-8);
   font-size: var(--text-control);
 }
 
@@ -79,7 +79,7 @@
 }
 
 .section-block {
-  margin: var(--space-7) 0;
+  margin: var(--space-10) 0;
 }
 
 .section-title-row {
@@ -118,7 +118,7 @@
   grid-template-columns: var(--space-13-5) 1fr;
   gap: var(--space-3-5);
   align-items: center;
-  padding: var(--space-3);
+  padding: var(--space-4);
   background: var(--app-accent-strong);
   color: var(--color-neutral-0);
   border-radius: var(--radius-ui);

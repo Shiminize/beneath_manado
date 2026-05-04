@@ -10,7 +10,7 @@
 .screen {
   width: min(100%, var(--generated-length-1120px));
   margin: 0 auto;
-  padding: var(--space-8-5) var(--space-5-5) 0;
+  padding: var(--space-8) var(--space-6) 0;
 }
 
 .screen-header {
@@ -18,7 +18,7 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--space-4-5);
-  margin-bottom: var(--space-6);
+  margin-bottom: var(--space-10);
 }
 
 .screen-header h1 {
@@ -40,7 +40,7 @@
 
 @media (max-width: 700px) {
   .screen {
-    padding-inline: var(--space-4-5);
+    padding-inline: var(--space-6);
   }
 }
 

@@ -57,7 +57,7 @@ describe('storage repository', () => {
     expect(loaded.preferences.fontFamily).toBe('palatino');
   });
 
-  it('defaults legacy state without a color palette to sage', () => {
+  it('defaults legacy state without a color palette to parchment', () => {
     const storage = new MemoryStorage();
     const state = createInitialState(items);
     delete (state.preferences as Partial<typeof state.preferences>).colorPalette;
@@ -65,10 +65,10 @@ describe('storage repository', () => {
     saveAppState(state, storage);
     const loaded = loadAppState(items, storage);
 
-    expect(loaded.preferences.colorPalette).toBe('sage');
+    expect(loaded.preferences.colorPalette).toBe('parchment');
   });
 
-  it('normalizes an invalid color palette to sage', () => {
+  it('normalizes an invalid color palette to parchment', () => {
     const storage = new MemoryStorage();
     const state = createInitialState(items);
     (state.preferences as { colorPalette?: string }).colorPalette = 'plum';
@@ -76,7 +76,7 @@ describe('storage repository', () => {
     saveAppState(state, storage);
     const loaded = loadAppState(items, storage);
 
-    expect(loaded.preferences.colorPalette).toBe('sage');
+    expect(loaded.preferences.colorPalette).toBe('parchment');
   });
 
   it('persists a valid color palette', () => {

@@ -799,6 +799,14 @@
   --palette-card-text: var(--palette-marine-text);
 }
 
+.palette-card.parchment {
+  --palette-card-app: var(--palette-parchment-app-bg);
+  --palette-card-bg: var(--palette-parchment-panel-soft);
+  --palette-card-reader: var(--palette-parchment-reader-bg);
+  --palette-card-action: var(--palette-parchment-action);
+  --palette-card-text: var(--palette-parchment-text);
+}
+
 .theme-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
