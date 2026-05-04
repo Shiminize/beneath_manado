@@ -115,7 +115,7 @@ export function AdminScreen() {
     const payload = await response.json().catch(() => ({}));
 
     if (!response.ok) {
-      setMessage(payload.error || 'Unable to sign in.');
+      setMessage(getAdminLoginMessage(payload.error));
       return;
     }
 
@@ -201,6 +201,13 @@ export function AdminScreen() {
       )}
     </main>
   );
+}
+
+function getAdminLoginMessage(error?: string) {
+  if (error === 'invalid_password') return 'Incorrect owner password.';
+  if (error === 'too_many_attempts') return 'Too many attempts. Wait a few minutes before trying again.';
+  if (error === 'admin_auth_not_configured') return 'Admin login is not configured yet.';
+  return 'Unable to sign in.';
 }
 
 function SetupPanel({ setup, setupRequired }: { setup: SetupStatus; setupRequired?: boolean }) {
