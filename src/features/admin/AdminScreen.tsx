@@ -42,6 +42,12 @@ type AnalyticsSnapshot = {
   }>;
 };
 
+type AdminStatus = {
+  setup?: SetupStatus;
+  setupRequired?: boolean;
+  authenticated?: boolean;
+};
+
 export function AdminScreen() {
   const [password, setPassword] = useState('');
   const [range, setRange] = useState('30d');
@@ -58,6 +64,24 @@ export function AdminScreen() {
   async function loadAnalytics() {
     setLoading(true);
     setMessage(null);
+    const statusResponse = await fetch('/api/admin/status', { credentials: 'include' });
+    const statusPayload: AdminStatus = await statusResponse.json().catch(() => ({}));
+
+    if (!statusResponse.ok) {
+      setLoading(false);
+      setMessage('Unable to check admin access.');
+      return;
+    }
+
+    setSetupStatus(statusPayload.setup || null);
+
+    if (!statusPayload.authenticated) {
+      setLoginRequired(true);
+      setSnapshot(null);
+      setLoading(false);
+      return;
+    }
+
     const response = await fetch(`/api/admin/analytics?range=${range}`, { credentials: 'include' });
     const payload = await response.json().catch(() => ({}));
     setLoading(false);
@@ -136,7 +160,7 @@ export function AdminScreen() {
 
       {loginRequired ? (
         <>
-          {setupStatus && <SetupPanel setup={setupStatus} setupRequired />}
+          {setupStatus && <SetupPanel setup={setupStatus} />}
           <form className="admin-login" onSubmit={handleLogin}>
             <AppIcon icon={LockKeyhole} size="large" />
             <h2>Owner password</h2>
