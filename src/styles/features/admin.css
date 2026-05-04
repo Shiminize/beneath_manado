@@ -4,7 +4,9 @@
   --admin-locked-tone: var(--app-accent-strong);
   --admin-password-tone: var(--app-cyan);
   --admin-status-soft: color-mix(in oklab, var(--app-accent) 12%, transparent);
-  --admin-locked-soft: color-mix(in oklab, var(--app-accent-strong) 12%, transparent);
+  --admin-locked-soft: color-mix(in oklab, var(--app-accent-strong) 18%, transparent);
+  --admin-locked-surface: color-mix(in oklab, var(--app-accent-strong) 14%, var(--surface-panel));
+  --admin-locked-rail: color-mix(in oklab, var(--app-accent-strong) 74%, var(--app-ink));
   --admin-password-soft: color-mix(in oklab, var(--app-cyan) 12%, transparent);
 }
 
@@ -170,6 +172,10 @@
   overflow: hidden;
 }
 
+.admin-book-row.is-locked {
+  background: var(--admin-locked-surface);
+}
+
 .admin-book-row::before {
   content: '';
   position: absolute;
@@ -179,7 +185,7 @@
 }
 
 .admin-book-row.is-locked::before {
-  background: var(--admin-locked-tone);
+  background: var(--admin-locked-rail);
 }
 
 .admin-book-main,
@@ -219,6 +225,7 @@
 
 .admin-status-badge.is-locked {
   background: var(--admin-locked-soft);
+  color: var(--app-ink);
 }
 
 .admin-status-badge svg {
@@ -240,10 +247,28 @@
   font-size: var(--text-ui-sm);
 }
 
-.admin-book-stats span {
+.admin-book-stats span,
+.admin-stat-link {
   display: inline-flex;
   align-items: center;
   gap: var(--space-1);
+}
+
+.admin-stat-link {
+  appearance: none;
+  margin: var(--space-0);
+  border: var(--generated-length-1px) solid color-mix(in oklab, var(--app-accent) 28%, transparent);
+  border-radius: var(--radius-pill);
+  background: color-mix(in oklab, var(--app-accent) 8%, transparent);
+  color: var(--app-ink);
+  cursor: pointer;
+  font: inherit;
+  padding: var(--space-1) var(--space-2);
+}
+
+.admin-stat-link:hover,
+.admin-stat-link:focus-visible {
+  background: color-mix(in oklab, var(--app-accent) 14%, transparent);
 }
 
 .admin-depth-bar {
@@ -299,6 +324,63 @@
   min-height: var(--target-md);
 }
 
+.admin-book-view-panel {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border-radius: var(--radius-ui-sm);
+  background: color-mix(in oklab, var(--surface-panel-strong) 78%, var(--surface-chip));
+}
+
+.admin-book-view-heading,
+.admin-view-refresh,
+.admin-book-view-item {
+  display: flex;
+  align-items: center;
+}
+
+.admin-book-view-heading {
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.admin-view-refresh {
+  gap: var(--space-1);
+  margin: var(--space-0);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--surface-floating-soft);
+  color: var(--app-muted);
+  cursor: pointer;
+  font: inherit;
+  padding: var(--space-1) var(--space-2);
+}
+
+.admin-book-view-list {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.admin-book-view-item {
+  flex-wrap: wrap;
+  gap: var(--space-1-5) var(--space-3);
+  padding: var(--space-2);
+  border-radius: var(--radius-ui-sm);
+  background: color-mix(in oklab, var(--surface-panel) 82%, transparent);
+  color: var(--app-muted);
+  font-size: var(--text-ui-sm);
+}
+
+.admin-book-view-item strong {
+  color: var(--app-ink);
+}
+
+.admin-book-view-item span {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
 .screen-admin .ui-button:disabled {
   cursor: default;
   opacity: 0.42;
@@ -332,6 +414,10 @@
   .admin-book-row {
     grid-template-columns: minmax(var(--space-0), 1fr) minmax(var(--generated-length-280px), var(--generated-length-420px)) auto;
     align-items: center;
+  }
+
+  .admin-book-view-panel {
+    grid-column: 1 / -1;
   }
 
   .admin-book-heading {

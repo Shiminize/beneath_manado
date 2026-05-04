@@ -1,6 +1,19 @@
 import { useEffect, useState } from 'react';
 import type { CSSProperties, FormEvent } from 'react';
-import { Activity, Eye, Globe2, KeyRound, LockKeyhole, RefreshCw, ShieldCheck, UnlockKeyhole } from 'lucide-react';
+import {
+  Activity,
+  ChevronDown,
+  ChevronUp,
+  Clock3,
+  Eye,
+  Globe2,
+  KeyRound,
+  LockKeyhole,
+  MapPin,
+  RefreshCw,
+  ShieldCheck,
+  UnlockKeyhole
+} from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { AppIcon, Button } from '../../ui';
 import { cx } from '../../ui/classes';
@@ -10,16 +23,33 @@ type SetupStatus = {
   hasSessionSecret: boolean;
   hasAnalyticsHashSecret: boolean;
   hasAdminPasswordHash: boolean;
+  hasBookPasswordEncryptionKey?: boolean;
 };
+
+type PasswordState = 'none' | 'visible' | 'reset_required';
 
 type AdminBook = {
   id: string;
   title: string;
   locked: boolean;
   hasPassword: boolean;
+  passwordDisplay?: string | null;
+  passwordUpdatedAt?: string | null;
+  passwordState: PasswordState;
   views: number;
   sessions: number;
   maxPercent: number;
+};
+
+type BookViewEvent = {
+  createdAt: string;
+  eventType: string;
+  ipNetwork: string;
+  country: string;
+  chapterIndex?: number | null;
+  pageIndex?: number | null;
+  percent?: number | null;
+  durationSeconds?: number | null;
 };
 
 type AnalyticsSnapshot = {
@@ -140,6 +170,8 @@ export function AdminScreen() {
       setMessage(
         payload.error === 'database_not_configured'
           ? 'Database required before password changes can be saved.'
+          : payload.error === 'book_password_encryption_key_required'
+            ? 'BOOK_PASSWORD_ENCRYPTION_KEY is required before visible password display can be saved.'
           : payload.error || 'Unable to update book access.'
       );
       return;
@@ -216,7 +248,8 @@ function SetupPanel({ setup, setupRequired }: { setup: SetupStatus; setupRequire
     !setup.hasDatabase && 'DATABASE_URL',
     !setup.hasSessionSecret && 'SESSION_SECRET',
     !setup.hasAnalyticsHashSecret && 'ANALYTICS_HASH_SECRET',
-    !setup.hasAdminPasswordHash && 'ADMIN_PASSWORD_HASH'
+    !setup.hasAdminPasswordHash && 'ADMIN_PASSWORD_HASH',
+    !setup.hasBookPasswordEncryptionKey && 'BOOK_PASSWORD_ENCRYPTION_KEY'
   ].filter(Boolean);
 
   if (!missing.length && !setupRequired) return null;
@@ -279,7 +312,13 @@ function AnalyticsView({
 
       <section className="admin-grid" aria-label="Book access and views">
         {snapshot.books.map((book) => (
-          <BookAccessRow key={book.id} book={book} canManageAccess={snapshot.setup.hasDatabase} onUpdate={onUpdateBookAccess} />
+          <BookAccessRow
+            key={book.id}
+            book={book}
+            canManageAccess={snapshot.setup.hasDatabase}
+            range={range}
+            onUpdate={onUpdateBookAccess}
+          />
         ))}
       </section>
 
@@ -333,14 +372,24 @@ function Metric({ label, value }: { label: string; value: number }) {
 function BookAccessRow({
   book,
   canManageAccess,
+  range,
   onUpdate
 }: {
   book: AdminBook;
   canManageAccess: boolean;
+  range: string;
   onUpdate: (bookId: string, locked: boolean, password: string) => Promise<void>;
 }) {
   const [password, setPassword] = useState('');
   const [saving, setSaving] = useState(false);
+  const [viewsOpen, setViewsOpen] = useState(false);
+  const [viewsLoading, setViewsLoading] = useState(false);
+  const [viewsError, setViewsError] = useState<string | null>(null);
+  const [viewEvents, setViewEvents] = useState<BookViewEvent[] | null>(null);
+
+  useEffect(() => {
+    if (viewsOpen) void loadBookViews();
+  }, [range]);
 
   async function handleUpdate(locked: boolean) {
     if (!canManageAccess) return;
@@ -350,8 +399,39 @@ function BookAccessRow({
     setSaving(false);
   }
 
+  async function handleToggleViews() {
+    if (viewsOpen) {
+      setViewsOpen(false);
+      return;
+    }
+
+    setViewsOpen(true);
+    await loadBookViews();
+  }
+
+  async function loadBookViews() {
+    setViewsLoading(true);
+    setViewsError(null);
+
+    const response = await fetch(`/api/admin/books/${encodeURIComponent(book.id)}/views?range=${range}`, {
+      credentials: 'include'
+    });
+    const payload = await response.json().catch(() => ({}));
+    setViewsLoading(false);
+
+    if (!response.ok) {
+      setViewsError(payload.error || 'Unable to load view details.');
+      setViewEvents(null);
+      return;
+    }
+
+    setViewEvents(Array.isArray(payload.events) ? payload.events : []);
+  }
+
   const lockActionLabel = book.locked ? 'Update' : 'Lock';
   const passwordCopy = getBookPasswordCopy(book, password);
+  const passwordTooShort = password.length > 0 && password.length < 8;
+  const lockNeedsPassword = !book.hasPassword || (book.locked && book.passwordState === 'reset_required');
 
   return (
     <article className={cx('admin-book-row', book.locked ? 'is-locked' : 'is-public')}>
@@ -361,7 +441,16 @@ function BookAccessRow({
           <BookStatusBadge book={book} />
         </div>
         <div className="admin-book-stats" aria-label={`${book.title} analytics`}>
-          <span><AppIcon icon={Eye} size="compact" />{book.views} views</span>
+          <button
+            className="admin-stat-link"
+            type="button"
+            aria-expanded={viewsOpen}
+            onClick={() => void handleToggleViews()}
+          >
+            <AppIcon icon={Eye} size="compact" />
+            <span>{book.views} views</span>
+            <AppIcon icon={viewsOpen ? ChevronUp : ChevronDown} size="compact" />
+          </button>
           <span><AppIcon icon={Activity} size="compact" />{book.sessions} sessions</span>
           <span>{book.maxPercent}% max depth</span>
         </div>
@@ -403,13 +492,44 @@ function BookAccessRow({
         <Button
           type="button"
           variant={book.locked ? 'filled' : 'soft'}
-          disabled={!canManageAccess || saving || (!book.hasPassword && password.length < 8)}
+          disabled={!canManageAccess || saving || passwordTooShort || (lockNeedsPassword && password.length < 8)}
           onClick={() => void handleUpdate(true)}
         >
           <AppIcon icon={LockKeyhole} size="standard" />
           {lockActionLabel}
         </Button>
       </div>
+
+      {viewsOpen && (
+        <div className="admin-book-view-panel">
+          <div className="admin-book-view-heading">
+            <strong>View details</strong>
+            <button type="button" className="admin-view-refresh" onClick={() => void loadBookViews()}>
+              <AppIcon icon={RefreshCw} size="compact" />
+              Refresh
+            </button>
+          </div>
+          {viewsLoading ? (
+            <p>Loading view details.</p>
+          ) : viewsError ? (
+            <p className="admin-message">{viewsError}</p>
+          ) : viewEvents?.length ? (
+            <div className="admin-book-view-list">
+              {viewEvents.map((event, index) => (
+                <article key={`${event.createdAt}-${event.eventType}-${event.pageIndex ?? 'open'}-${index}`} className="admin-book-view-item">
+                  <strong>{new Date(event.createdAt).toLocaleString()}</strong>
+                  <span><AppIcon icon={MapPin} size="compact" />{event.ipNetwork} · {event.country}</span>
+                  <span>{formatChapterPage(event)}</span>
+                  <span>{formatPercent(event.percent)}</span>
+                  <span><AppIcon icon={Clock3} size="compact" />{formatDuration(event.durationSeconds)}</span>
+                </article>
+              ))}
+            </div>
+          ) : (
+            <p>No view events in this range.</p>
+          )}
+        </div>
+      )}
     </article>
   );
 }
@@ -437,11 +557,21 @@ function getBookPasswordCopy(book: AdminBook, draftPassword: string) {
     };
   }
 
-  if (book.hasPassword) {
+  if (book.passwordState === 'visible' && book.passwordDisplay) {
     return {
-      label: 'Stored password',
-      value: 'Secure hash saved',
-      helper: 'Existing passwords are not reversible. Type a reset password to change it.'
+      label: 'Current password',
+      value: book.passwordDisplay,
+      helper: book.passwordUpdatedAt
+        ? `Last changed ${new Date(book.passwordUpdatedAt).toLocaleString()}. Type a new password to change it.`
+        : 'Type a new password to change it.'
+    };
+  }
+
+  if (book.passwordState === 'reset_required' || book.hasPassword) {
+    return {
+      label: 'Current password',
+      value: 'Password not recoverable - reset to display',
+      helper: 'This lock was stored as a hash only. Type a new password to make it visible here going forward.'
     };
   }
 
@@ -450,6 +580,22 @@ function getBookPasswordCopy(book: AdminBook, draftPassword: string) {
     value: 'No password set',
     helper: 'Type at least 8 characters, then lock the book.'
   };
+}
+
+function formatChapterPage(event: BookViewEvent) {
+  const chapter = typeof event.chapterIndex === 'number' ? `Chapter ${event.chapterIndex + 1}` : 'Chapter unknown';
+  const page = typeof event.pageIndex === 'number' ? `Page ${event.pageIndex + 1}` : 'Page unknown';
+  return `${chapter} · ${page}`;
+}
+
+function formatPercent(percent?: number | null) {
+  return `${Math.max(0, Math.min(100, Number(percent || 0)))}% read`;
+}
+
+function formatDuration(seconds?: number | null) {
+  const value = Math.max(0, Number(seconds || 0));
+  if (value < 60) return `${value}s`;
+  return `${Math.round(value / 60)}m`;
 }
 
 function getProgressStyle(maxPercent: number): CSSProperties {

@@ -1,6 +1,7 @@
 import { neon } from '@neondatabase/serverless';
 import { randomUUID } from 'node:crypto';
 import { getSeedBook, listSeedBooks } from './book-source.js';
+import { decryptDisplayPassword } from './security.js';
 
 let sqlClient;
 let schemaPromise;
@@ -16,13 +17,18 @@ export async function listBooksForAdmin() {
       ...book,
       content: undefined,
       locked: false,
-      hasPassword: false
+      hasPassword: false,
+      passwordDisplay: null,
+      passwordState: 'none',
+      passwordUpdatedAt: null
     }));
   }
 
   await ensureSchema();
   const rows = await sql()`
-    select id, title, author, subtitle, cover, item_type, section, tags, total_chapters, word_count, initial_status, locked, password_hash
+    select
+      id, title, author, subtitle, cover, item_type, section, tags, total_chapters, word_count, initial_status,
+      locked, password_hash, password_display_payload, password_display_created_at, password_display_updated_at
     from reader_books
     order by title asc
   `;
@@ -33,12 +39,23 @@ export async function listBooksForAdmin() {
 export async function getBookRecord(bookId) {
   if (!hasDatabase()) {
     const seed = getSeedBook(bookId);
-    return seed ? { ...seed, locked: false, passwordHash: null } : null;
+    return seed
+      ? {
+          ...seed,
+          locked: false,
+          passwordHash: null,
+          passwordDisplay: null,
+          passwordState: 'none',
+          passwordUpdatedAt: null
+        }
+      : null;
   }
 
   await ensureSchema();
   const rows = await sql()`
-    select id, title, author, subtitle, cover, item_type, section, tags, total_chapters, word_count, initial_status, locked, password_hash, content_payload
+    select
+      id, title, author, subtitle, cover, item_type, section, tags, total_chapters, word_count, initial_status,
+      locked, password_hash, password_display_payload, password_display_created_at, password_display_updated_at, content_payload
     from reader_books
     where id = ${bookId}
     limit 1
@@ -51,16 +68,46 @@ export async function getBookRecord(bookId) {
   };
 }
 
-export async function setBookAccess(bookId, { locked, passwordHash }) {
+export async function setBookAccess(bookId, { locked, passwordHash, passwordDisplayPayload, hasNewPassword = false }) {
   if (!hasDatabase()) {
     return { ok: false, error: 'database_not_configured' };
   }
 
   await ensureSchema();
+
+  if (!locked) {
+    const rows = await sql()`
+      update reader_books
+      set locked = false,
+          password_hash = null,
+          password_display_payload = null,
+          password_display_created_at = null,
+          password_display_updated_at = null,
+          updated_at = now()
+      where id = ${bookId}
+      returning id
+    `;
+    return rows[0] ? { ok: true } : { ok: false, error: 'book_not_found' };
+  }
+
+  if (hasNewPassword) {
+    const rows = await sql()`
+      update reader_books
+      set locked = true,
+          password_hash = ${passwordHash || null},
+          password_display_payload = ${passwordDisplayPayload || null},
+          password_display_created_at = coalesce(password_display_created_at, now()),
+          password_display_updated_at = now(),
+          updated_at = now()
+      where id = ${bookId}
+      returning id
+    `;
+    return rows[0] ? { ok: true } : { ok: false, error: 'book_not_found' };
+  }
+
   const rows = await sql()`
     update reader_books
-    set locked = ${Boolean(locked)},
-        password_hash = ${passwordHash || null},
+    set locked = true,
         updated_at = now()
     where id = ${bookId}
     returning id
@@ -214,6 +261,38 @@ export async function getAnalyticsSnapshot({ rangeDays = 30, bookId = 'all' }) {
   };
 }
 
+export async function listBookViewEvents({ bookId, rangeDays = 30, limit = 80 }) {
+  if (!hasDatabase()) {
+    return { setupRequired: true, events: [] };
+  }
+
+  await ensureSchema();
+  const boundedLimit = Math.min(200, Math.max(1, Number(limit) || 80));
+  const rows = await sql()`
+    select event_type, chapter_index, page_index, percent, duration_seconds, ip_network, country, created_at
+    from reader_events
+    where book_id = ${bookId}
+      and event_type in ('book_open', 'page_view')
+      and created_at > now() - make_interval(days => ${rangeDays})
+    order by created_at desc
+    limit ${boundedLimit}
+  `;
+
+  return {
+    setupRequired: false,
+    events: rows.map((row) => ({
+      createdAt: row.created_at,
+      eventType: row.event_type,
+      ipNetwork: row.ip_network,
+      country: row.country,
+      chapterIndex: row.chapter_index,
+      pageIndex: row.page_index,
+      percent: row.percent,
+      durationSeconds: row.duration_seconds
+    }))
+  };
+}
+
 export async function ensureSchema() {
   if (!hasDatabase()) return;
   if (!schemaPromise) {
@@ -249,6 +328,10 @@ async function initializeSchema() {
       updated_at timestamptz not null default now()
     )
   `;
+
+  await sql()`alter table reader_books add column if not exists password_display_payload text`;
+  await sql()`alter table reader_books add column if not exists password_display_created_at timestamptz`;
+  await sql()`alter table reader_books add column if not exists password_display_updated_at timestamptz`;
 
   await sql()`
     create table if not exists reader_sessions (
@@ -326,6 +409,8 @@ async function initializeSchema() {
 }
 
 function mapBookRow(row) {
+  const passwordDisplayState = resolvePasswordDisplayState(row);
+
   return {
     id: row.id,
     type: row.item_type,
@@ -341,8 +426,30 @@ function mapBookRow(row) {
     initialStatus: row.initial_status,
     locked: row.locked,
     passwordHash: row.password_hash || null,
-    hasPassword: Boolean(row.password_hash)
+    hasPassword: Boolean(row.password_hash),
+    passwordDisplay: passwordDisplayState.passwordDisplay,
+    passwordState: passwordDisplayState.passwordState,
+    passwordUpdatedAt: row.password_display_updated_at || null
   };
+}
+
+export function resolvePasswordDisplayState(row) {
+  if (!row.password_hash) {
+    return { passwordDisplay: null, passwordState: 'none' };
+  }
+
+  if (!row.password_display_payload) {
+    return { passwordDisplay: null, passwordState: 'reset_required' };
+  }
+
+  try {
+    const passwordDisplay = decryptDisplayPassword(row.password_display_payload);
+    if (passwordDisplay) return { passwordDisplay, passwordState: 'visible' };
+  } catch {
+    // If the display key is missing or rotated, preserve the hash-only lock state.
+  }
+
+  return { passwordDisplay: null, passwordState: 'reset_required' };
 }
 
 function nullableNumber(value) {
