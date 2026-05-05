@@ -6,6 +6,10 @@ import { decryptDisplayPassword } from './security.js';
 let sqlClient;
 let schemaPromise;
 let lastRetentionCleanup = 0;
+const readingSessionMigrationId = 'aggregate-page-events-to-reading-sessions-v1';
+const readingSessionInactivityMinutes = 30;
+const rawReaderEventTypes = new Set(['book_open', 'page_view', 'progress']);
+const readingSessionEventTypes = new Set(['reading_session_start', 'reading_session_heartbeat', 'reading_session_end']);
 
 export function hasDatabase() {
   return Boolean(process.env.DATABASE_URL);
@@ -149,18 +153,24 @@ export async function recordAnalyticsEvent(event, identity) {
     on conflict (id) do update set last_seen_at = now()
   `;
 
-  await sql()`
-    insert into reader_events (
-      id, session_id, visitor_hash, event_type, book_id, chapter_index, page_index, percent, duration_seconds,
-      total_pages, total_chapters, ip_network, country
-    )
-    values (
-      ${randomUUID()}, ${event.sessionId}, ${identity.visitorHash || 'unknown'}, ${event.type}, ${event.bookId || null},
-      ${nullableNumber(event.chapterIndex)}, ${nullableNumber(event.pageIndex)}, ${nullableNumber(event.percent)},
-      ${nullableNumber(event.durationSeconds)}, ${nullableNumber(event.totalPages)}, ${nullableNumber(event.totalChapters)},
-      ${identity.ipNetwork}, ${identity.country}
-    )
-  `;
+  if (isReadingSessionEvent(event)) {
+    await recordReadingSessionEvent(event, identity);
+  }
+
+  if (shouldStoreRawAnalyticsEvent(event)) {
+    await sql()`
+      insert into reader_events (
+        id, session_id, visitor_hash, event_type, book_id, chapter_index, page_index, percent, duration_seconds,
+        total_pages, total_chapters, ip_network, country
+      )
+      values (
+        ${randomUUID()}, ${event.sessionId}, ${identity.visitorHash || 'unknown'}, ${event.type}, ${event.bookId || null},
+        ${nullableNumber(event.chapterIndex)}, ${nullableNumber(event.pageIndex)}, ${nullableNumber(event.percent)},
+        ${nullableNumber(event.durationSeconds)}, ${nullableNumber(event.totalPages)}, ${nullableNumber(event.totalChapters)},
+        ${identity.ipNetwork}, ${identity.country}
+      )
+    `;
+  }
 
   await cleanupRetention();
 
@@ -171,8 +181,9 @@ export async function getAnalyticsSnapshot({ rangeDays = 30, bookId = 'all' }) {
   if (!hasDatabase()) {
     return {
       setupRequired: true,
-      totals: { views: 0, sessions: 0, uniqueVisitors: 0, readMinutes: 0 },
+      totals: { readingSessions: 0, views: 0, sessions: 0, uniqueVisitors: 0, readMinutes: 0 },
       books: [],
+      recentSessions: [],
       recentEvents: [],
       progressDepth: []
     };
@@ -182,11 +193,11 @@ export async function getAnalyticsSnapshot({ rangeDays = 30, bookId = 'all' }) {
   const bookFilter = bookId === 'all' ? null : bookId;
   const totals = await sql()`
     select
-      count(*) filter (where event_type in ('book_open', 'page_view'))::int as views,
-      count(distinct session_id)::int as sessions,
+      count(*)::int as reading_sessions,
+      count(distinct site_session_id)::int as sessions,
       count(distinct visitor_hash)::int as unique_visitors,
       coalesce(sum(duration_seconds), 0)::int as read_seconds
-    from reader_events
+    from reader_reading_sessions
     where created_at > now() - make_interval(days => ${rangeDays})
       and (${bookFilter}::text is null or book_id = ${bookFilter})
   `;
@@ -196,28 +207,34 @@ export async function getAnalyticsSnapshot({ rangeDays = 30, bookId = 'all' }) {
       b.id,
       b.title,
       b.locked,
-      count(e.*) filter (where e.event_type in ('book_open', 'page_view'))::int as views,
-      count(distinct e.session_id)::int as sessions,
-      coalesce(max(e.percent), 0)::int as max_percent
+      count(rs.*)::int as reading_sessions,
+      count(distinct rs.site_session_id)::int as sessions,
+      coalesce(max(rs.max_percent), 0)::int as max_percent
     from reader_books b
-    left join reader_events e on e.book_id = b.id and e.created_at > now() - make_interval(days => ${rangeDays})
+    left join reader_reading_sessions rs on rs.book_id = b.id and rs.created_at > now() - make_interval(days => ${rangeDays})
     where (${bookFilter}::text is null or b.id = ${bookFilter})
     group by b.id, b.title, b.locked
-    order by views desc, b.title asc
+    order by reading_sessions desc, b.title asc
   `;
 
-  const recentEvents = await sql()`
-    select event_type, book_id, chapter_index, page_index, percent, duration_seconds, ip_network, country, created_at
-    from reader_events
+  const recentSessions = await sql()`
+    select
+      book_id, started_at, last_seen_at, ended_at, duration_seconds, ip_network, country,
+      start_chapter_index, start_page_index, last_chapter_index, last_page_index, max_percent
+    from reader_reading_sessions
     where created_at > now() - make_interval(days => ${rangeDays})
       and (${bookFilter}::text is null or book_id = ${bookFilter})
-    order by created_at desc
+    order by coalesce(ended_at, last_seen_at, started_at) desc
     limit 60
   `;
 
   const progressDepth = await sql()`
-    select book_id, max(percent)::int as max_percent, max(chapter_index)::int as deepest_chapter, max(page_index)::int as deepest_page
-    from reader_events
+    select
+      book_id,
+      max(max_percent)::int as max_percent,
+      max(last_chapter_index)::int as deepest_chapter,
+      max(last_page_index)::int as deepest_page
+    from reader_reading_sessions
     where created_at > now() - make_interval(days => ${rangeDays})
       and book_id is not null
       and (${bookFilter}::text is null or book_id = ${bookFilter})
@@ -228,7 +245,8 @@ export async function getAnalyticsSnapshot({ rangeDays = 30, bookId = 'all' }) {
   return {
     setupRequired: false,
     totals: {
-      views: Number(totals[0]?.views || 0),
+      readingSessions: Number(totals[0]?.reading_sessions || 0),
+      views: Number(totals[0]?.reading_sessions || 0),
       sessions: Number(totals[0]?.sessions || 0),
       uniqueVisitors: Number(totals[0]?.unique_visitors || 0),
       readMinutes: Math.round(Number(totals[0]?.read_seconds || 0) / 60)
@@ -237,20 +255,22 @@ export async function getAnalyticsSnapshot({ rangeDays = 30, bookId = 'all' }) {
       id: row.id,
       title: row.title,
       locked: row.locked,
-      views: Number(row.views || 0),
+      readingSessions: Number(row.reading_sessions || 0),
+      views: Number(row.reading_sessions || 0),
       sessions: Number(row.sessions || 0),
       maxPercent: Number(row.max_percent || 0)
     })),
-    recentEvents: recentEvents.map((row) => ({
-      type: row.event_type,
+    recentSessions: recentSessions.map(mapReadingSessionRow),
+    recentEvents: recentSessions.map((row) => ({
+      type: 'reading_session',
       bookId: row.book_id,
-      chapterIndex: row.chapter_index,
-      pageIndex: row.page_index,
-      percent: row.percent,
+      chapterIndex: row.last_chapter_index,
+      pageIndex: row.last_page_index,
+      percent: row.max_percent,
       durationSeconds: row.duration_seconds,
       ipNetwork: row.ip_network,
       country: row.country,
-      createdAt: row.created_at
+      createdAt: row.started_at
     })),
     progressDepth: progressDepth.map((row) => ({
       bookId: row.book_id,
@@ -261,36 +281,33 @@ export async function getAnalyticsSnapshot({ rangeDays = 30, bookId = 'all' }) {
   };
 }
 
-export async function listBookViewEvents({ bookId, rangeDays = 30, limit = 80 }) {
+export async function listBookReadingSessions({ bookId, rangeDays = 30, limit = 80 }) {
   if (!hasDatabase()) {
-    return { setupRequired: true, events: [] };
+    return { setupRequired: true, sessions: [] };
   }
 
   await ensureSchema();
   const boundedLimit = Math.min(200, Math.max(1, Number(limit) || 80));
   const rows = await sql()`
-    select event_type, chapter_index, page_index, percent, duration_seconds, ip_network, country, created_at
-    from reader_events
+    select
+      book_id, started_at, last_seen_at, ended_at, duration_seconds, ip_network, country,
+      start_chapter_index, start_page_index, last_chapter_index, last_page_index, max_percent
+    from reader_reading_sessions
     where book_id = ${bookId}
-      and event_type in ('book_open', 'page_view')
       and created_at > now() - make_interval(days => ${rangeDays})
-    order by created_at desc
+    order by coalesce(ended_at, last_seen_at, started_at) desc
     limit ${boundedLimit}
   `;
 
   return {
     setupRequired: false,
-    events: rows.map((row) => ({
-      createdAt: row.created_at,
-      eventType: row.event_type,
-      ipNetwork: row.ip_network,
-      country: row.country,
-      chapterIndex: row.chapter_index,
-      pageIndex: row.page_index,
-      percent: row.percent,
-      durationSeconds: row.duration_seconds
-    }))
+    sessions: rows.map(mapReadingSessionRow)
   };
+}
+
+export async function listBookViewEvents(options) {
+  const result = await listBookReadingSessions(options);
+  return { ...result, events: result.sessions || [] };
 }
 
 export async function ensureSchema() {
@@ -365,6 +382,35 @@ async function initializeSchema() {
   `;
 
   await sql()`
+    create table if not exists reader_reading_sessions (
+      id text primary key,
+      site_session_id text not null,
+      book_id text not null,
+      visitor_hash text not null,
+      ip_network text not null,
+      country text not null,
+      started_at timestamptz not null default now(),
+      last_seen_at timestamptz not null default now(),
+      ended_at timestamptz,
+      duration_seconds integer not null default 0,
+      start_chapter_index integer,
+      start_page_index integer,
+      last_chapter_index integer,
+      last_page_index integer,
+      max_percent integer not null default 0,
+      created_at timestamptz not null default now(),
+      updated_at timestamptz not null default now()
+    )
+  `;
+
+  await sql()`
+    create table if not exists reader_analytics_migrations (
+      id text primary key,
+      applied_at timestamptz not null default now()
+    )
+  `;
+
+  await sql()`
     create table if not exists reader_unlock_audit (
       id text primary key,
       target text not null,
@@ -379,6 +425,9 @@ async function initializeSchema() {
   await sql()`create index if not exists reader_events_created_at_idx on reader_events (created_at desc)`;
   await sql()`create index if not exists reader_events_book_created_idx on reader_events (book_id, created_at desc)`;
   await sql()`create index if not exists reader_events_session_idx on reader_events (session_id)`;
+  await sql()`create index if not exists reader_reading_sessions_book_created_idx on reader_reading_sessions (book_id, created_at desc)`;
+  await sql()`create index if not exists reader_reading_sessions_site_book_idx on reader_reading_sessions (site_session_id, book_id, last_seen_at desc)`;
+  await sql()`create index if not exists reader_reading_sessions_active_idx on reader_reading_sessions (site_session_id, ended_at, last_seen_at desc)`;
   await sql()`create index if not exists reader_unlock_audit_target_visitor_idx on reader_unlock_audit (target, visitor_hash, created_at desc)`;
 
   for (const book of listSeedBooks()) {
@@ -406,6 +455,174 @@ async function initializeSchema() {
         updated_at = now()
     `;
   }
+
+  await migrateLegacyPageViewsToReadingSessions();
+}
+
+async function recordReadingSessionEvent(event, identity) {
+  if (!event.bookId) return;
+
+  const mode = getReadingSessionMode(event.type);
+  const durationSeconds = nullableNumber(event.durationSeconds);
+  const chapterIndex = nullableNumber(event.chapterIndex);
+  const pageIndex = nullableNumber(event.pageIndex);
+  const percent = nullableNumber(event.percent) || 0;
+
+  if (mode === 'start') {
+    await sql()`
+      update reader_reading_sessions
+      set ended_at = coalesce(ended_at, last_seen_at),
+          updated_at = now()
+      where site_session_id = ${event.sessionId}
+        and book_id <> ${event.bookId}
+        and ended_at is null
+    `;
+  }
+
+  const activeRows = await sql()`
+    select id
+    from reader_reading_sessions
+    where site_session_id = ${event.sessionId}
+      and book_id = ${event.bookId}
+      and ended_at is null
+      and last_seen_at > now() - make_interval(mins => ${readingSessionInactivityMinutes})
+    order by last_seen_at desc
+    limit 1
+  `;
+
+  if (!activeRows[0]) {
+    await sql()`
+      insert into reader_reading_sessions (
+        id, site_session_id, book_id, visitor_hash, ip_network, country, started_at, last_seen_at, ended_at,
+        duration_seconds, start_chapter_index, start_page_index, last_chapter_index, last_page_index, max_percent
+      )
+      values (
+        ${randomUUID()}, ${event.sessionId}, ${event.bookId}, ${identity.visitorHash || 'unknown'}, ${identity.ipNetwork}, ${identity.country},
+        now(), now(), ${mode === 'end' ? new Date().toISOString() : null},
+        ${durationSeconds || 0}, ${chapterIndex}, ${pageIndex}, ${chapterIndex}, ${pageIndex}, ${percent}
+      )
+    `;
+    return;
+  }
+
+  const activeId = activeRows[0].id;
+  if (mode === 'end') {
+    await sql()`
+      update reader_reading_sessions
+      set last_seen_at = now(),
+          ended_at = now(),
+          duration_seconds = greatest(
+            coalesce(duration_seconds, 0),
+            coalesce(${durationSeconds}::int, greatest(0, floor(extract(epoch from (now() - started_at)))::int))
+          ),
+          last_chapter_index = coalesce(${chapterIndex}, last_chapter_index),
+          last_page_index = coalesce(${pageIndex}, last_page_index),
+          max_percent = greatest(coalesce(max_percent, 0), ${percent}),
+          updated_at = now()
+      where id = ${activeId}
+    `;
+    return;
+  }
+
+  await sql()`
+    update reader_reading_sessions
+    set last_seen_at = now(),
+        duration_seconds = greatest(
+          coalesce(duration_seconds, 0),
+          coalesce(${durationSeconds}::int, greatest(0, floor(extract(epoch from (now() - started_at)))::int))
+        ),
+        start_chapter_index = coalesce(start_chapter_index, ${chapterIndex}),
+        start_page_index = coalesce(start_page_index, ${pageIndex}),
+        last_chapter_index = coalesce(${chapterIndex}, last_chapter_index),
+        last_page_index = coalesce(${pageIndex}, last_page_index),
+        max_percent = greatest(coalesce(max_percent, 0), ${percent}),
+        updated_at = now()
+    where id = ${activeId}
+  `;
+}
+
+async function migrateLegacyPageViewsToReadingSessions() {
+  const migrations = await sql()`
+    select id
+    from reader_analytics_migrations
+    where id = ${readingSessionMigrationId}
+    limit 1
+  `;
+  if (migrations[0]) return;
+
+  const rows = await sql()`
+    select session_id, visitor_hash, event_type, book_id, chapter_index, page_index, percent, duration_seconds, ip_network, country, created_at
+    from reader_events
+    where event_type in ('book_open', 'page_view')
+      and book_id is not null
+    order by session_id asc, book_id asc, created_at asc
+  `;
+  const groups = buildLegacyReadingSessionGroups(rows, readingSessionInactivityMinutes);
+
+  for (const group of groups) {
+    await sql()`
+      insert into reader_reading_sessions (
+        id, site_session_id, book_id, visitor_hash, ip_network, country, started_at, last_seen_at, ended_at,
+        duration_seconds, start_chapter_index, start_page_index, last_chapter_index, last_page_index, max_percent, created_at, updated_at
+      )
+      values (
+        ${group.id}, ${group.siteSessionId}, ${group.bookId}, ${group.visitorHash}, ${group.ipNetwork}, ${group.country},
+        ${group.startedAt.toISOString()}, ${group.lastSeenAt.toISOString()}, ${group.endedAt.toISOString()},
+        ${group.durationSeconds}, ${group.startChapterIndex}, ${group.startPageIndex}, ${group.lastChapterIndex}, ${group.lastPageIndex},
+        ${group.maxPercent}, ${group.startedAt.toISOString()}, now()
+      )
+      on conflict (id) do nothing
+    `;
+  }
+
+  await sql()`delete from reader_events where event_type = 'page_view'`;
+  await sql()`
+    insert into reader_analytics_migrations (id)
+    values (${readingSessionMigrationId})
+    on conflict (id) do nothing
+  `;
+}
+
+export function buildLegacyReadingSessionGroups(rows, inactivityMinutes = readingSessionInactivityMinutes) {
+  const inactivityMs = inactivityMinutes * 60 * 1000;
+  const sortedRows = [...rows]
+    .filter((row) => getRowValue(row, 'book_id', 'bookId') && getRowValue(row, 'session_id', 'sessionId'))
+    .sort((left, right) => {
+      const leftKey = `${getRowValue(left, 'session_id', 'sessionId')}:${getRowValue(left, 'book_id', 'bookId')}`;
+      const rightKey = `${getRowValue(right, 'session_id', 'sessionId')}:${getRowValue(right, 'book_id', 'bookId')}`;
+      if (leftKey !== rightKey) return leftKey.localeCompare(rightKey);
+      return getRowDate(left).getTime() - getRowDate(right).getTime();
+    });
+
+  const groups = [];
+  let current = null;
+
+  for (const row of sortedRows) {
+    const rowTime = getRowDate(row);
+    const siteSessionId = getRowValue(row, 'session_id', 'sessionId');
+    const bookId = getRowValue(row, 'book_id', 'bookId');
+    const startsNextGroup =
+      !current ||
+      current.siteSessionId !== siteSessionId ||
+      current.bookId !== bookId ||
+      rowTime.getTime() - current.lastSeenAt.getTime() > inactivityMs;
+
+    if (startsNextGroup) {
+      current = createLegacyReadingSessionGroup(row, rowTime);
+      groups.push(current);
+    }
+
+    applyLegacyReadingSessionRow(current, row, rowTime);
+  }
+
+  for (const group of groups) {
+    if (!group.durationSeconds) {
+      group.durationSeconds = Math.max(0, Math.round((group.lastSeenAt.getTime() - group.startedAt.getTime()) / 1000));
+    }
+    group.endedAt = group.lastSeenAt;
+  }
+
+  return groups;
 }
 
 function mapBookRow(row) {
@@ -452,6 +669,89 @@ export function resolvePasswordDisplayState(row) {
   return { passwordDisplay: null, passwordState: 'reset_required' };
 }
 
+export function shouldStoreRawAnalyticsEvent(event) {
+  return !rawReaderEventTypes.has(event.type) && !readingSessionEventTypes.has(event.type);
+}
+
+function isReadingSessionEvent(event) {
+  return Boolean(event.bookId) && (rawReaderEventTypes.has(event.type) || readingSessionEventTypes.has(event.type));
+}
+
+function getReadingSessionMode(eventType) {
+  if (eventType === 'book_open' || eventType === 'reading_session_start') return 'start';
+  if (eventType === 'session_end' || eventType === 'reading_session_end') return 'end';
+  return 'heartbeat';
+}
+
+function mapReadingSessionRow(row) {
+  return {
+    bookId: row.book_id,
+    startedAt: row.started_at,
+    lastSeenAt: row.last_seen_at,
+    endedAt: row.ended_at,
+    durationSeconds: row.duration_seconds,
+    ipNetwork: row.ip_network,
+    country: row.country,
+    startChapterIndex: row.start_chapter_index,
+    startPageIndex: row.start_page_index,
+    lastChapterIndex: row.last_chapter_index,
+    lastPageIndex: row.last_page_index,
+    maxPercent: Number(row.max_percent || 0)
+  };
+}
+
+function createLegacyReadingSessionGroup(row, rowTime) {
+  const siteSessionId = getRowValue(row, 'session_id', 'sessionId');
+  const bookId = getRowValue(row, 'book_id', 'bookId');
+
+  return {
+    id: `legacy:${siteSessionId}:${bookId}:${rowTime.toISOString()}`,
+    siteSessionId,
+    bookId,
+    visitorHash: getRowValue(row, 'visitor_hash', 'visitorHash') || 'unknown',
+    ipNetwork: getRowValue(row, 'ip_network', 'ipNetwork') || 'unknown',
+    country: getRowValue(row, 'country', 'country') || 'XX',
+    startedAt: rowTime,
+    lastSeenAt: rowTime,
+    endedAt: rowTime,
+    durationSeconds: 0,
+    startChapterIndex: null,
+    startPageIndex: null,
+    lastChapterIndex: null,
+    lastPageIndex: null,
+    maxPercent: 0
+  };
+}
+
+function applyLegacyReadingSessionRow(group, row, rowTime) {
+  const chapterIndex = nullableNumber(getRowValue(row, 'chapter_index', 'chapterIndex'));
+  const pageIndex = nullableNumber(getRowValue(row, 'page_index', 'pageIndex'));
+  const percent = nullableNumber(getRowValue(row, 'percent', 'percent')) || 0;
+  const durationSeconds = nullableNumber(getRowValue(row, 'duration_seconds', 'durationSeconds')) || 0;
+
+  group.lastSeenAt = rowTime;
+  group.durationSeconds += durationSeconds;
+  group.maxPercent = Math.max(group.maxPercent, percent);
+
+  if (chapterIndex !== null || pageIndex !== null) {
+    if (group.startChapterIndex === null && group.startPageIndex === null) {
+      group.startChapterIndex = chapterIndex;
+      group.startPageIndex = pageIndex;
+    }
+    group.lastChapterIndex = chapterIndex;
+    group.lastPageIndex = pageIndex;
+  }
+}
+
+function getRowValue(row, snakeKey, camelKey) {
+  return row[snakeKey] ?? row[camelKey] ?? null;
+}
+
+function getRowDate(row) {
+  const value = getRowValue(row, 'created_at', 'createdAt');
+  return value instanceof Date ? value : new Date(value);
+}
+
 function nullableNumber(value) {
   return typeof value === 'number' && Number.isFinite(value) ? value : null;
 }
@@ -464,5 +764,6 @@ async function cleanupRetention() {
   const parsedRetentionDays = Number(process.env.ANALYTICS_RETENTION_DAYS || 90);
   const retentionDays = Number.isFinite(parsedRetentionDays) ? Math.max(1, parsedRetentionDays) : 90;
   await sql()`delete from reader_events where created_at < now() - make_interval(days => ${retentionDays})`;
+  await sql()`delete from reader_reading_sessions where created_at < now() - make_interval(days => ${retentionDays})`;
   await sql()`delete from reader_unlock_audit where created_at < now() - make_interval(days => ${retentionDays})`;
 }

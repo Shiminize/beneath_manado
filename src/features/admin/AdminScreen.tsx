@@ -36,19 +36,24 @@ type AdminBook = {
   passwordDisplay?: string | null;
   passwordUpdatedAt?: string | null;
   passwordState: PasswordState;
+  readingSessions?: number;
   views: number;
   sessions: number;
   maxPercent: number;
 };
 
-type BookViewEvent = {
-  createdAt: string;
-  eventType: string;
+type BookReadingSession = {
+  bookId?: string;
+  startedAt: string;
+  lastSeenAt: string;
+  endedAt?: string | null;
   ipNetwork: string;
   country: string;
-  chapterIndex?: number | null;
-  pageIndex?: number | null;
-  percent?: number | null;
+  startChapterIndex?: number | null;
+  startPageIndex?: number | null;
+  lastChapterIndex?: number | null;
+  lastPageIndex?: number | null;
+  maxPercent?: number | null;
   durationSeconds?: number | null;
 };
 
@@ -56,12 +61,14 @@ type AnalyticsSnapshot = {
   setup: SetupStatus;
   setupRequired?: boolean;
   totals: {
+    readingSessions?: number;
     views: number;
     sessions: number;
     uniqueVisitors: number;
     readMinutes: number;
   };
   books: AdminBook[];
+  recentSessions?: BookReadingSession[];
   recentEvents: Array<{
     type: string;
     bookId?: string;
@@ -304,13 +311,13 @@ function AnalyticsView({
       </section>
 
       <section className="admin-metrics" aria-label="Analytics totals">
-        <Metric label="Views" value={snapshot.totals.views} />
+        <Metric label="Reading sessions" value={snapshot.totals.readingSessions ?? snapshot.totals.views} />
         <Metric label="Sessions" value={snapshot.totals.sessions} />
         <Metric label="Unique visitor-days" value={snapshot.totals.uniqueVisitors} />
         <Metric label="Read minutes" value={snapshot.totals.readMinutes} />
       </section>
 
-      <section className="admin-grid" aria-label="Book access and views">
+      <section className="admin-grid" aria-label="Book access and reading sessions">
         {snapshot.books.map((book) => (
           <BookAccessRow
             key={book.id}
@@ -324,16 +331,16 @@ function AnalyticsView({
 
       <section className="admin-events" aria-label="Recent behavior">
         <h2>Recent behavior</h2>
-        {snapshot.recentEvents.length ? (
-          snapshot.recentEvents.map((event) => (
-            <article key={`${event.createdAt}-${event.type}-${event.bookId || 'site'}`} className="admin-event">
-              <strong>{event.type.replace('_', ' ')}</strong>
-              <span>{event.bookId || 'site'} · {event.percent ?? 0}% · {event.durationSeconds ?? 0}s</span>
-              <small>{event.ipNetwork} · {event.country} · {new Date(event.createdAt).toLocaleString()}</small>
+        {(snapshot.recentSessions || []).length ? (
+          (snapshot.recentSessions || []).map((session, index) => (
+            <article key={`${session.startedAt}-${session.bookId || 'book'}-${index}`} className="admin-event">
+              <strong>Reading session</strong>
+              <span>{session.bookId || 'book'} · {session.maxPercent ?? 0}% max · {formatDuration(session.durationSeconds)}</span>
+              <small>{session.ipNetwork} · {session.country} · {formatSessionWindow(session)}</small>
             </article>
           ))
         ) : (
-          <p>No events stored yet.</p>
+          <p>No reading sessions stored yet.</p>
         )}
       </section>
     </>
@@ -382,13 +389,13 @@ function BookAccessRow({
 }) {
   const [password, setPassword] = useState('');
   const [saving, setSaving] = useState(false);
-  const [viewsOpen, setViewsOpen] = useState(false);
-  const [viewsLoading, setViewsLoading] = useState(false);
-  const [viewsError, setViewsError] = useState<string | null>(null);
-  const [viewEvents, setViewEvents] = useState<BookViewEvent[] | null>(null);
+  const [sessionsOpen, setSessionsOpen] = useState(false);
+  const [sessionsLoading, setSessionsLoading] = useState(false);
+  const [sessionsError, setSessionsError] = useState<string | null>(null);
+  const [readingSessions, setReadingSessions] = useState<BookReadingSession[] | null>(null);
 
   useEffect(() => {
-    if (viewsOpen) void loadBookViews();
+    if (sessionsOpen) void loadBookSessions();
   }, [range]);
 
   async function handleUpdate(locked: boolean) {
@@ -399,33 +406,33 @@ function BookAccessRow({
     setSaving(false);
   }
 
-  async function handleToggleViews() {
-    if (viewsOpen) {
-      setViewsOpen(false);
+  async function handleToggleSessions() {
+    if (sessionsOpen) {
+      setSessionsOpen(false);
       return;
     }
 
-    setViewsOpen(true);
-    await loadBookViews();
+    setSessionsOpen(true);
+    await loadBookSessions();
   }
 
-  async function loadBookViews() {
-    setViewsLoading(true);
-    setViewsError(null);
+  async function loadBookSessions() {
+    setSessionsLoading(true);
+    setSessionsError(null);
 
-    const response = await fetch(`/api/admin/books/${encodeURIComponent(book.id)}/views?range=${range}`, {
+    const response = await fetch(`/api/admin/books/${encodeURIComponent(book.id)}/sessions?range=${range}`, {
       credentials: 'include'
     });
     const payload = await response.json().catch(() => ({}));
-    setViewsLoading(false);
+    setSessionsLoading(false);
 
     if (!response.ok) {
-      setViewsError(payload.error || 'Unable to load view details.');
-      setViewEvents(null);
+      setSessionsError(payload.error || 'Unable to load reading sessions.');
+      setReadingSessions(null);
       return;
     }
 
-    setViewEvents(Array.isArray(payload.events) ? payload.events : []);
+    setReadingSessions(Array.isArray(payload.sessions) ? payload.sessions : []);
   }
 
   const lockActionLabel = book.locked ? 'Update' : 'Lock';
@@ -444,12 +451,12 @@ function BookAccessRow({
           <button
             className="admin-stat-link"
             type="button"
-            aria-expanded={viewsOpen}
-            onClick={() => void handleToggleViews()}
+            aria-expanded={sessionsOpen}
+            onClick={() => void handleToggleSessions()}
           >
             <AppIcon icon={Eye} size="compact" />
-            <span>{book.views} views</span>
-            <AppIcon icon={viewsOpen ? ChevronUp : ChevronDown} size="compact" />
+            <span>{book.readingSessions ?? book.views} reading sessions</span>
+            <AppIcon icon={sessionsOpen ? ChevronUp : ChevronDown} size="compact" />
           </button>
           <span><AppIcon icon={Activity} size="compact" />{book.sessions} sessions</span>
           <span>{book.maxPercent}% max depth</span>
@@ -500,33 +507,33 @@ function BookAccessRow({
         </Button>
       </div>
 
-      {viewsOpen && (
+      {sessionsOpen && (
         <div className="admin-book-view-panel">
           <div className="admin-book-view-heading">
-            <strong>View details</strong>
-            <button type="button" className="admin-view-refresh" onClick={() => void loadBookViews()}>
+            <strong>Reading session details</strong>
+            <button type="button" className="admin-view-refresh" onClick={() => void loadBookSessions()}>
               <AppIcon icon={RefreshCw} size="compact" />
               Refresh
             </button>
           </div>
-          {viewsLoading ? (
-            <p>Loading view details.</p>
-          ) : viewsError ? (
-            <p className="admin-message">{viewsError}</p>
-          ) : viewEvents?.length ? (
+          {sessionsLoading ? (
+            <p>Loading reading sessions.</p>
+          ) : sessionsError ? (
+            <p className="admin-message">{sessionsError}</p>
+          ) : readingSessions?.length ? (
             <div className="admin-book-view-list">
-              {viewEvents.map((event, index) => (
-                <article key={`${event.createdAt}-${event.eventType}-${event.pageIndex ?? 'open'}-${index}`} className="admin-book-view-item">
-                  <strong>{new Date(event.createdAt).toLocaleString()}</strong>
-                  <span><AppIcon icon={MapPin} size="compact" />{event.ipNetwork} · {event.country}</span>
-                  <span>{formatChapterPage(event)}</span>
-                  <span>{formatPercent(event.percent)}</span>
-                  <span><AppIcon icon={Clock3} size="compact" />{formatDuration(event.durationSeconds)}</span>
+              {readingSessions.map((session, index) => (
+                <article key={`${session.startedAt}-${session.bookId || book.id}-${index}`} className="admin-book-view-item">
+                  <strong>{formatSessionWindow(session)}</strong>
+                  <span><AppIcon icon={MapPin} size="compact" />{session.ipNetwork} · {session.country}</span>
+                  <span>{formatSessionLocation(session)}</span>
+                  <span>{formatPercent(session.maxPercent)}</span>
+                  <span><AppIcon icon={Clock3} size="compact" />{formatDuration(session.durationSeconds)}</span>
                 </article>
               ))}
             </div>
           ) : (
-            <p>No view events in this range.</p>
+            <p>No reading sessions in this range.</p>
           )}
         </div>
       )}
@@ -582,10 +589,20 @@ function getBookPasswordCopy(book: AdminBook, draftPassword: string) {
   };
 }
 
-function formatChapterPage(event: BookViewEvent) {
-  const chapter = typeof event.chapterIndex === 'number' ? `Chapter ${event.chapterIndex + 1}` : 'Chapter unknown';
-  const page = typeof event.pageIndex === 'number' ? `Page ${event.pageIndex + 1}` : 'Page unknown';
+function formatChapterPage(chapterIndex?: number | null, pageIndex?: number | null) {
+  const chapter = typeof chapterIndex === 'number' ? `Chapter ${chapterIndex + 1}` : 'Chapter unknown';
+  const page = typeof pageIndex === 'number' ? `Page ${pageIndex + 1}` : 'Page unknown';
   return `${chapter} · ${page}`;
+}
+
+function formatSessionLocation(session: BookReadingSession) {
+  return `${formatChapterPage(session.startChapterIndex, session.startPageIndex)} -> ${formatChapterPage(session.lastChapterIndex, session.lastPageIndex)}`;
+}
+
+function formatSessionWindow(session: BookReadingSession) {
+  const start = new Date(session.startedAt).toLocaleString();
+  const end = session.endedAt || session.lastSeenAt;
+  return end ? `${start} -> ${new Date(end).toLocaleString()}` : start;
 }
 
 function formatPercent(percent?: number | null) {

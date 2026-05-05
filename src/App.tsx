@@ -19,9 +19,37 @@ export function App() {
   const [route, setRoute] = useState<AppRoute>(() => (window.location.pathname === '/admin' ? { view: 'admin' } : { view: 'home' }));
   const [bookContentById, setBookContentById] = useState<Record<string, BookContent[]>>({});
   const [accessState, setAccessState] = useState<BookAccessState>({ status: 'idle' });
-  const lastReaderEvent = useRef<{ itemId: string; location: ReaderLocation; startedAt: number } | null>(null);
+  const activeReadingSession = useRef<ActiveReadingSession | null>(null);
   const suggestions = useMemo(() => buildSuggestions(items, appState), [appState, items]);
   const activeReaderItemId = route.view === 'reader' ? route.itemId : undefined;
+
+  const startActiveReadingSession = useCallback(
+    (itemId: string, location: ReaderLocation, percent: number, totalChapters?: number) => {
+      const session = {
+        itemId,
+        location,
+        percent,
+        totalChapters,
+        startedAt: Date.now()
+      };
+      activeReadingSession.current = session;
+      trackAnalyticsEvent(buildReadingSessionEvent('reading_session_start', session));
+    },
+    []
+  );
+
+  const sendReadingSessionHeartbeat = useCallback(() => {
+    const session = activeReadingSession.current;
+    if (!session || document.visibilityState === 'hidden') return;
+    trackAnalyticsEvent(buildReadingSessionEvent('reading_session_heartbeat', session));
+  }, []);
+
+  const endActiveReadingSession = useCallback(() => {
+    const session = activeReadingSession.current;
+    if (!session) return;
+    trackAnalyticsEvent(buildReadingSessionEvent('reading_session_end', session));
+    activeReadingSession.current = null;
+  }, []);
 
   useEffect(() => {
     saveAppState(appState);
@@ -29,10 +57,30 @@ export function App() {
 
   useEffect(() => {
     trackAnalyticsEvent({ type: 'session_start' });
-    const handlePageHide = () => trackAnalyticsEvent({ type: 'session_end' });
+    const handlePageHide = () => {
+      endActiveReadingSession();
+      trackAnalyticsEvent({ type: 'session_end' });
+    };
     window.addEventListener('pagehide', handlePageHide);
     return () => window.removeEventListener('pagehide', handlePageHide);
-  }, []);
+  }, [endActiveReadingSession]);
+
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'hidden') {
+        endActiveReadingSession();
+        return;
+      }
+
+      if (route.view !== 'reader' || !route.location || activeReadingSession.current) return;
+      const progress = appState.progress[route.itemId];
+      const content = bookContentById[route.itemId];
+      startActiveReadingSession(route.itemId, route.location, progress?.percent ?? 0, content?.length);
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, [appState.progress, bookContentById, endActiveReadingSession, route, startActiveReadingSession]);
 
   useEffect(() => {
     if (route.view !== 'reader') return;
@@ -57,6 +105,12 @@ export function App() {
     return () => window.clearInterval(interval);
   }, [route]);
 
+  useEffect(() => {
+    if (route.view !== 'reader') return;
+    const interval = window.setInterval(sendReadingSessionHeartbeat, 30000);
+    return () => window.clearInterval(interval);
+  }, [route, sendReadingSessionHeartbeat]);
+
   const openItem = useCallback(
     async (itemId: string, chapterIndex?: number) => {
       setAccessState({ status: 'loading', itemId, chapterIndex });
@@ -78,19 +132,20 @@ export function App() {
         return;
       }
 
-      lastReaderEvent.current = null;
+      const nextLocation = {
+        chapterIndex: chapterIndex ?? progress?.chapterIndex ?? 0,
+        pageIndex: chapterIndex === undefined ? progress?.pageIndex ?? 0 : 0
+      };
+      endActiveReadingSession();
       setRoute({
         view: 'reader',
         itemId,
-        location: {
-          chapterIndex: chapterIndex ?? progress?.chapterIndex ?? 0,
-          pageIndex: chapterIndex === undefined ? progress?.pageIndex ?? 0 : 0
-        }
+        location: nextLocation
       });
       setAccessState({ status: 'idle' });
-      trackAnalyticsEvent({ type: 'book_open', bookId: itemId, totalChapters: content.length });
+      startActiveReadingSession(itemId, nextLocation, progress?.percent ?? 0, content.length);
     },
-    [appState.progress, bookContentById]
+    [appState.progress, bookContentById, endActiveReadingSession, startActiveReadingSession]
   );
 
   const updateProgress = useCallback((itemId: string, location: ReaderLocation, percent: number) => {
@@ -123,26 +178,20 @@ export function App() {
       if (!activeReaderItemId) return;
       updateProgress(activeReaderItemId, location, percent);
       const currentContent = bookContentById[activeReaderItemId];
-      const now = Date.now();
-      const previous = lastReaderEvent.current;
-      const isSameLocation =
-        previous?.itemId === activeReaderItemId &&
-        previous.location.chapterIndex === location.chapterIndex &&
-        previous.location.pageIndex === location.pageIndex;
-      if (isSameLocation) return;
+      const session = activeReadingSession.current;
+      if (!session || session.itemId !== activeReaderItemId) {
+        startActiveReadingSession(activeReaderItemId, location, percent, currentContent?.length);
+        return;
+      }
 
-      trackAnalyticsEvent({
-        type: 'page_view',
-        bookId: activeReaderItemId,
-        chapterIndex: location.chapterIndex,
-        pageIndex: location.pageIndex,
+      activeReadingSession.current = {
+        ...session,
+        location,
         percent,
-        durationSeconds: previous?.itemId === activeReaderItemId ? Math.round((now - previous.startedAt) / 1000) : 0,
         totalChapters: currentContent?.length
-      });
-      lastReaderEvent.current = { itemId: activeReaderItemId, location, startedAt: now };
+      };
     },
-    [activeReaderItemId, bookContentById, updateProgress]
+    [activeReaderItemId, bookContentById, startActiveReadingSession, updateProgress]
   );
 
   const updatePreferences = useCallback((preferences: Partial<ReaderPreferences>) => {
@@ -201,7 +250,7 @@ export function App() {
         initialLocation={route.location}
         preferences={appState.preferences}
         onClose={() => {
-          lastReaderEvent.current = null;
+          endActiveReadingSession();
           setRoute({ view: 'home' });
         }}
         onProgressChange={updateActiveReaderProgress}
@@ -272,3 +321,23 @@ type BookAccessState =
   | { status: 'loading'; itemId: string; chapterIndex?: number }
   | { status: 'locked'; itemId: string; title: string; chapterIndex?: number }
   | { status: 'error'; itemId?: string; message: string };
+
+type ActiveReadingSession = {
+  itemId: string;
+  location: ReaderLocation;
+  percent: number;
+  startedAt: number;
+  totalChapters?: number;
+};
+
+function buildReadingSessionEvent(type: 'reading_session_start' | 'reading_session_heartbeat' | 'reading_session_end', session: ActiveReadingSession) {
+  return {
+    type,
+    bookId: session.itemId,
+    chapterIndex: session.location.chapterIndex,
+    pageIndex: session.location.pageIndex,
+    percent: session.percent,
+    durationSeconds: Math.max(0, Math.round((Date.now() - session.startedAt) / 1000)),
+    totalChapters: session.totalChapters
+  };
+}

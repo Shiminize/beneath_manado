@@ -23,7 +23,8 @@ export default async function handler(request, response) {
   const analyticsByBookId = new Map(snapshot.books.map((book) => [book.id, book]));
   const books = accessRows.map((book) => ({
     ...book,
-    views: analyticsByBookId.get(book.id)?.views || 0,
+    readingSessions: analyticsByBookId.get(book.id)?.readingSessions || 0,
+    views: analyticsByBookId.get(book.id)?.readingSessions || 0,
     sessions: analyticsByBookId.get(book.id)?.sessions || 0,
     maxPercent: analyticsByBookId.get(book.id)?.maxPercent || 0
   }));

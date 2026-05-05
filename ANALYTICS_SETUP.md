@@ -34,6 +34,7 @@ Copy the printed value into `BOOK_PASSWORD_ENCRYPTION_KEY`.
 ## Production Notes
 
 - Full IP addresses are not stored. The server stores a masked network and a daily HMAC visitor hash.
+- Reading behavior is stored as per-book reading sessions, not raw page-turn rows. Older page-view rows are aggregated into reading sessions and then removed by the analytics migration.
 - Reader unlocks use Argon2id password hashes. The admin dashboard can also show newly set/reset book passwords by storing a separate encrypted display copy with `BOOK_PASSWORD_ENCRYPTION_KEY`.
 - Existing hash-only book passwords cannot be recovered; reset the book password once to make it visible in the admin dashboard going forward.
 - The first API request creates the analytics tables and seeds the current packaged books.

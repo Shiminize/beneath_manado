@@ -17,7 +17,7 @@ export default async function handler(request, response) {
   }
 
   if (!getSetupStatus().hasDatabase) {
-    sendJson(response, 503, { ok: false, error: 'database_not_configured', setup: getSetupStatus(), sessions: [], events: [] });
+    sendJson(response, 503, { ok: false, error: 'database_not_configured', setup: getSetupStatus(), sessions: [] });
     return;
   }
 
@@ -35,7 +35,6 @@ export default async function handler(request, response) {
     bookId,
     range,
     title: book.title,
-    events: result.sessions,
     ...result
   });
 }
