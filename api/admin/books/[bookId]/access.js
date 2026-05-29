@@ -1,6 +1,6 @@
 import { getBookRecord, setBookAccess } from '../../../_lib/database.js';
 import { getJsonBody, getRouteParam, requireMethod, sendJson } from '../../../_lib/http.js';
-import { assertAdmin, getSetupStatus, hashPassword } from '../../../_lib/security.js';
+import { assertAdmin, encryptDisplayPassword, getSetupStatus, hashPassword } from '../../../_lib/security.js';
 
 export default async function handler(request, response) {
   if (!requireMethod(request, response, ['PATCH'])) return;
@@ -25,20 +25,25 @@ export default async function handler(request, response) {
   try {
     const body = await getJsonBody(request);
     const locked = Boolean(body.locked);
-    const passwordHash = locked
-      ? typeof body.password === 'string' && body.password.length >= 8
-        ? await hashPassword(body.password)
-        : book.passwordHash
-      : null;
+    const hasNewPassword = locked && typeof body.password === 'string' && body.password.length >= 8;
+    const passwordHash = locked ? (hasNewPassword ? await hashPassword(body.password) : book.passwordHash) : null;
+    const passwordDisplayPayload = hasNewPassword ? encryptDisplayPassword(body.password) : null;
 
     if (locked && !passwordHash) {
       sendJson(response, 400, { ok: false, error: 'password_required' });
       return;
     }
 
-    const result = await setBookAccess(bookId, { locked, passwordHash });
+    const result = await setBookAccess(bookId, { locked, passwordHash, passwordDisplayPayload, hasNewPassword });
     sendJson(response, result.ok ? 200 : 404, result);
   } catch (error) {
-    sendJson(response, 400, { ok: false, error: error.message || 'bad_request' });
+    const message = error.message || 'bad_request';
+    const setup = getSetupStatus();
+    if (message.includes('BOOK_PASSWORD_ENCRYPTION_KEY')) {
+      sendJson(response, 503, { ok: false, error: 'book_password_encryption_key_required', message, setup });
+      return;
+    }
+
+    sendJson(response, 400, { ok: false, error: message });
   }
 }

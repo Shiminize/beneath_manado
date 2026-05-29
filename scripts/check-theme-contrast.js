@@ -3,57 +3,50 @@ import { readFile } from 'node:fs/promises';
 const tokenSource = await readFile('src/styles/tokens.css', 'utf8');
 const tokens = new Map([...tokenSource.matchAll(/--([\w-]+):\s*([^;]+);/g)].map((match) => [match[1], match[2].trim()]));
 
-const palettes = ['sage', 'oxide', 'noir', 'rose', 'dusk', 'marine'];
-const palettePairs = [
-  ['text', 'app-bg', 4.5, 'primary text on app background'],
-  ['text', 'panel', 4.5, 'primary text on panel'],
-  ['text', 'panel-soft', 4.5, 'primary text on soft panel'],
-  ['text', 'floating', 4.5, 'primary text on floating surface'],
-  ['text', 'sheet', 4.5, 'primary text on sheet'],
-  ['text', 'chip', 4.5, 'primary text on chip'],
-  ['muted', 'app-bg', 4.5, 'muted text on app background'],
-  ['muted', 'panel', 4.5, 'muted text on panel'],
-  ['muted', 'panel-soft', 4.5, 'muted text on soft panel'],
-  ['muted', 'sheet', 4.5, 'muted text on sheet'],
-  ['action-text', 'action', 4.5, 'action label text on action fill'],
-  ['action', 'app-bg', 3, 'action icon/control on app background'],
-  ['action', 'panel', 3, 'action icon/control on panel'],
-  ['reader-text', 'reader-bg', 4.5, 'reader text on reader page'],
-  ['reader-muted', 'reader-bg', 4.5, 'reader muted text on reader page'],
-  ['reader-text', 'reader-panel', 4.5, 'reader text on reader panel'],
-  ['reader-muted', 'reader-panel', 4.5, 'reader muted text on reader panel']
-];
+/*
+ * Folio has one app identity plus three reader themes (light / dark / contrast).
+ * Every pair below reads solid-hex raw tokens from tokens.css, so there is no
+ * palette list to keep in sync — adding a theme means adding its raw tokens here.
+ */
+const pairs = [
+  // App chrome (Folio light)
+  ['ink', 'bg-app', 4.5, 'primary text on app background'],
+  ['ink', 'bg-panel', 4.5, 'primary text on panel'],
+  ['ink', 'bg-panel-soft', 4.5, 'primary text on soft panel'],
+  ['ink', 'bg-chip', 4.5, 'primary text on chip'],
+  ['ink-muted', 'bg-app', 4.5, 'muted text on app background'],
+  ['ink-muted', 'bg-panel', 4.5, 'muted text on panel'],
+  ['ink-muted', 'bg-chip', 4.5, 'muted text on chip'],
+  ['ivory', 'accent', 4.5, 'action label on claret accent'],
+  ['accent', 'bg-app', 3, 'accent control on app background'],
+  ['accent', 'bg-panel', 3, 'accent control on panel'],
 
-const staticPairs = [
-  ['color-neutral-0', 'color-accent-red-700', 4.5, 'continue-card text on danger/accent card']
+  // Reader — light
+  ['reader-text-ink', 'bg-reader', 4.5, 'reader text on light page'],
+  ['reader-text-ink', 'bg-panel', 4.5, 'reader text on light panel'],
+  ['ink-muted', 'bg-reader', 4.5, 'reader muted text on light page'],
+
+  // Reader — dark
+  ['reader-dark-text', 'reader-dark-bg', 4.5, 'reader text on dark page'],
+  ['reader-dark-text', 'reader-dark-panel', 4.5, 'reader text on dark panel'],
+  ['reader-dark-muted', 'reader-dark-bg', 4.5, 'reader muted text on dark page'],
+  ['reader-dark-muted', 'reader-dark-panel', 4.5, 'reader muted text on dark panel'],
+  ['reader-dark-accent', 'reader-dark-bg', 3, 'reader accent on dark page'],
+
+  // Reader — high contrast
+  ['reader-contrast-text', 'reader-contrast-bg', 4.5, 'reader text on high-contrast page'],
+  ['reader-contrast-muted', 'reader-contrast-bg', 4.5, 'reader muted text on high-contrast page']
 ];
 
 const violations = [];
 
-for (const palette of palettes) {
-  for (const [foregroundKey, backgroundKey, minimum, label] of palettePairs) {
-    const foreground = token(`palette-${palette}-${foregroundKey}`);
-    const background = token(`palette-${palette}-${backgroundKey}`);
-    assertPair({
-      label: `${palette}: ${label}`,
-      foregroundName: `--palette-${palette}-${foregroundKey}`,
-      foreground,
-      backgroundName: `--palette-${palette}-${backgroundKey}`,
-      background,
-      minimum
-    });
+for (const [foregroundKey, backgroundKey, minimum, label] of pairs) {
+  const foreground = token(foregroundKey);
+  const background = token(backgroundKey);
+  const ratio = contrastRatio(foreground, background);
+  if (ratio < minimum) {
+    violations.push({ label, foregroundName: `--${foregroundKey}`, foreground, backgroundName: `--${backgroundKey}`, background, minimum, ratio });
   }
-}
-
-for (const [foregroundKey, backgroundKey, minimum, label] of staticPairs) {
-  assertPair({
-    label,
-    foregroundName: `--${foregroundKey}`,
-    foreground: token(foregroundKey),
-    backgroundName: `--${backgroundKey}`,
-    background: token(backgroundKey),
-    minimum
-  });
 }
 
 console.log(`Theme contrast scan: ${violations.length} contrast violations found.`);
@@ -66,13 +59,6 @@ if (violations.length) {
     );
   }
   process.exit(1);
-}
-
-function assertPair({ label, foregroundName, foreground, backgroundName, background, minimum }) {
-  const ratio = contrastRatio(foreground, background);
-  if (ratio < minimum) {
-    violations.push({ label, foregroundName, foreground, backgroundName, background, minimum, ratio });
-  }
 }
 
 function token(name) {

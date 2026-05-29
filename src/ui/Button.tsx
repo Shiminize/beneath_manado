@@ -23,7 +23,7 @@ export interface IconButtonProps extends ButtonHTMLAttributes<HTMLButtonElement>
   icon?: LucideIcon;
   iconSize?: AppIconSize;
   size?: 'compact' | 'standard';
-  variant?: 'plain' | 'filled' | 'soft';
+  variant?: 'plain' | 'soft';
 }
 
 export function IconButton({ label, children, icon, iconSize = 'standard', size = 'standard', variant = 'plain', className, ...props }: IconButtonProps) {

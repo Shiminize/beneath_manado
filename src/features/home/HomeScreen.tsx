@@ -116,7 +116,7 @@ export function HomeScreen({ items, state, suggestions, onOpenItem, onNavigateLi
       </section>
 
       <section className="privacy-note" aria-label="Privacy note">
-        Reader analytics collect views, reading progress, and approximate network information for owner insight. Full IP addresses are not stored.
+        Reader analytics collect reading sessions, progress depth, and approximate network information for owner insight. Full IP addresses are not stored.
       </section>
     </main>
   );

@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Concept G — Haven</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;1,7..72,400&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════
+   CONCEPT G: HAVEN
+   Soft, calm minimalism. Gently elevated rounded
+   cards on a warm-neutral wash, one muted sage accent,
+   airy spacing. The mood of a quiet reading nook.
+   ═══════════════════════════════════════════ */
+
+:root {
+  /* ── Surfaces ── */
+  --bg-app:      #f1efe9;
+  --bg-card:     #ffffff;
+  --bg-soft:     #f8f6f1;
+  --bg-reader:   #faf8f3;
+  --bg-chip:     #ebe8e0;
+
+  /* ── Text ── */
+  --text-primary:   #2b2a26;
+  --text-secondary: #6d6b63;
+  --text-muted:     #a4a199;
+  --reader-text:    #2b2a26;
+  --reader-muted:   #8b887f;
+
+  /* ── Accent (muted sage) ── */
+  --accent:       #5f8267;
+  --accent-deep:  #4c6b54;
+  --accent-soft:  #e4ece4;
+  --accent-tint:  rgba(95,130,103,0.12);
+
+  /* ── Borders & shadows (soft does the work) ── */
+  --border:      rgba(43,42,38,0.07);
+  --shadow-sm:   0 2px 8px rgba(43,42,38,0.05);
+  --shadow-md:   0 8px 24px rgba(43,42,38,0.07);
+  --shadow-lg:   0 16px 40px rgba(43,42,38,0.10);
+
+  /* ── Spacing (4px base, generous) ── */
+  --sp-1: 4px; --sp-2: 8px; --sp-3: 12px; --sp-4: 16px;
+  --sp-5: 20px; --sp-6: 24px; --sp-8: 32px; --sp-10: 40px;
+  --sp-12: 48px; --sp-16: 64px;
+
+  /* ── Radius (soft, rounded) ── */
+  --r-sm: 10px; --r-md: 16px; --r-lg: 24px; --r-xl: 30px; --r-pill: 999px;
+
+  /* ── Type ── */
+  --font-ui:     'DM Sans', -apple-system, sans-serif;
+  --font-reader: 'Literata', Georgia, serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; }
+
+body {
+  font-family: var(--font-ui);
+  background: var(--bg-app);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+  line-height: 1.5;
+}
+
+/* ── Concept header ── */
+.concept-header {
+  text-align: center;
+  padding: var(--sp-16) var(--sp-6) var(--sp-10);
+}
+.concept-header .eyebrow {
+  display: inline-block; font-size: 0.68rem; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--accent-deep); font-weight: 600; background: var(--accent-soft);
+  padding: 6px 14px; border-radius: var(--r-pill);
+}
+.concept-header h1 { font-size: clamp(2.4rem, 6vw, 3.6rem); font-weight: 600; letter-spacing: -0.02em; margin-top: var(--sp-4); }
+.concept-header p { color: var(--text-secondary); margin-top: var(--sp-3); font-size: 0.95rem; max-width: 540px; margin-inline: auto; }
+
+/* ── Sections ── */
+.section { max-width: 920px; margin: var(--sp-12) auto; padding: 0 var(--sp-6); }
+.section > .kicker { font-size: 0.7rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-muted); font-weight: 600; margin-bottom: var(--sp-2); }
+.section > h2 { font-size: 1.5rem; font-weight: 600; letter-spacing: -0.01em; margin-bottom: var(--sp-6); }
+
+/* ── Palette ── */
+.palette-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: var(--sp-3); }
+.swatch { aspect-ratio: 1; border-radius: var(--r-md); display: flex; flex-direction: column; justify-content: flex-end; padding: var(--sp-3); box-shadow: var(--shadow-sm); }
+.swatch span { font-size: 0.62rem; font-weight: 600; }
+.swatch .hex { opacity: 0.72; font-size: 0.56rem; font-weight: 400; }
+.type-spec { display: grid; gap: var(--sp-3); margin-top: var(--sp-6); }
+.type-spec .row { display: flex; align-items: baseline; gap: var(--sp-4); background: var(--bg-card); border-radius: var(--r-md); padding: var(--sp-4); box-shadow: var(--shadow-sm); }
+.type-spec .lbl { font-size: 0.62rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); width: 78px; flex-shrink: 0; font-weight: 600; }
+.type-spec .ex-h { font-size: 1.5rem; font-weight: 600; letter-spacing: -0.01em; }
+.type-spec .ex-r { font-family: var(--font-reader); font-size: 1.1rem; }
+.type-spec .ex-u { font-size: 0.95rem; }
+
+/* ── Device frame ── */
+.frames { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--sp-6); align-items: start; }
+.frame-label { font-size: 0.66rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); font-weight: 600; margin-bottom: var(--sp-3); }
+.phone { background: var(--bg-app); border-radius: 30px; overflow: hidden; box-shadow: var(--shadow-lg); display: flex; flex-direction: column; min-height: 600px; }
+.screen { flex: 1; display: flex; flex-direction: column; }
+
+/* ── Bottom nav ── */
+.nav-bar { display: flex; justify-content: space-around; padding: var(--sp-3) var(--sp-5) var(--sp-5); background: var(--bg-card); box-shadow: 0 -2px 12px rgba(43,42,38,0.04); }
+.nav-item { display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: 0.7rem; color: var(--text-muted); font-weight: 500; cursor: pointer; padding: var(--sp-2) var(--sp-4); border-radius: var(--r-md); }
+.nav-item .ic { font-size: 1.05rem; line-height: 1; }
+.nav-item.active { color: var(--accent-deep); background: var(--accent-soft); }
+
+/* ═══ HOME ═══ */
+.home { padding: var(--sp-6) var(--sp-5); flex: 1; display: flex; flex-direction: column; gap: var(--sp-5); }
+.home-top { display: flex; justify-content: space-between; align-items: center; }
+.home-greeting { font-size: 1.7rem; font-weight: 600; letter-spacing: -0.01em; }
+.goal-card { display: flex; align-items: center; gap: var(--sp-3); background: var(--bg-card); border-radius: var(--r-md); padding: var(--sp-3) var(--sp-4); box-shadow: var(--shadow-sm); }
+.ring { width: 42px; height: 42px; border-radius: 50%; background: conic-gradient(var(--accent) 20%, var(--accent-soft) 0); display: flex; align-items: center; justify-content: center; }
+.ring .inner { width: 32px; height: 32px; border-radius: 50%; background: var(--bg-card); display: flex; align-items: center; justify-content: center; font-size: 0.82rem; font-weight: 700; color: var(--accent-deep); }
+.goal-text .g1 { font-size: 0.78rem; font-weight: 600; }
+.goal-text .g2 { font-size: 0.66rem; color: var(--text-muted); }
+
+.sec-label { display: flex; justify-content: space-between; align-items: baseline; }
+.sec-label .l { font-size: 0.74rem; font-weight: 600; letter-spacing: 0.02em; color: var(--text-secondary); }
+.sec-label .m { font-size: 0.72rem; color: var(--accent-deep); }
+
+/* Continue = hero card */
+.hero { background: var(--bg-card); border-radius: var(--r-lg); padding: var(--sp-4); display: flex; gap: var(--sp-4); box-shadow: var(--shadow-md); cursor: pointer; }
+.hero-cover { width: 88px; height: 132px; border-radius: var(--r-sm); flex-shrink: 0; background: linear-gradient(155deg,#5b1416,#1c0a0b); box-shadow: var(--shadow-md); display: flex; align-items: center; justify-content: center; text-align: center; padding: 8px; font-family: var(--font-reader); font-style: italic; font-size: 0.62rem; color: #e9c9a8; line-height: 1.35; }
+.hero-body { display: flex; flex-direction: column; justify-content: center; flex: 1; }
+.hero-body .title { font-size: 1.18rem; font-weight: 600; line-height: 1.2; letter-spacing: -0.01em; }
+.hero-body .author { font-size: 0.8rem; color: var(--text-secondary); margin-top: 2px; }
+.hero-body .meta { font-size: 0.72rem; color: var(--text-muted); margin-top: var(--sp-3); }
+.hero-bar { height: 6px; background: var(--bg-chip); border-radius: var(--r-pill); margin-top: var(--sp-2); overflow: hidden; }
+.hero-bar > i { display: block; height: 100%; width: 4%; background: var(--accent); border-radius: var(--r-pill); }
+.hero-resume { margin-top: var(--sp-3); align-self: flex-start; background: var(--accent); color: #fff; font-size: 0.74rem; font-weight: 600; padding: 8px 16px; border-radius: var(--r-pill); }
+
+/* Top picks = soft cards */
+.picks { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp-3); }
+.pick { background: var(--bg-card); border-radius: var(--r-md); overflow: hidden; box-shadow: var(--shadow-sm); cursor: pointer; }
+.pick-cover { aspect-ratio: 3/4; }
+.pick-info { padding: var(--sp-3); }
+.pick-info .pt { font-size: 0.74rem; font-weight: 600; line-height: 1.2; }
+.pick-info .pg { font-size: 0.62rem; color: var(--text-muted); margin-top: 3px; }
+
+/* ═══ LIBRARY ═══ */
+.lib { padding: var(--sp-6) var(--sp-5); flex: 1; display: flex; flex-direction: column; gap: var(--sp-4); }
+.lib-head { display: flex; align-items: baseline; gap: var(--sp-3); }
+.lib-head h3 { font-size: 1.7rem; font-weight: 600; letter-spacing: -0.01em; }
+.lib-head .count { font-size: 0.74rem; color: var(--text-muted); }
+.lib-filters { display: flex; gap: var(--sp-2); flex-wrap: wrap; }
+.lib-filters .f { font-size: 0.74rem; color: var(--text-secondary); cursor: pointer; padding: 7px 14px; border-radius: var(--r-pill); background: var(--bg-chip); }
+.lib-filters .f.active { color: #fff; background: var(--accent); font-weight: 600; }
+.lib-list { display: grid; gap: var(--sp-3); }
+.lib-row { display: flex; gap: var(--sp-4); align-items: center; background: var(--bg-card); border-radius: var(--r-md); padding: var(--sp-3); box-shadow: var(--shadow-sm); }
+.lib-cover { width: 50px; height: 72px; border-radius: var(--r-sm); flex-shrink: 0; box-shadow: var(--shadow-sm); }
+.lib-meta { flex: 1; min-width: 0; }
+.lib-meta .lt { font-size: 0.96rem; font-weight: 600; line-height: 1.2; }
+.lib-meta .ls { font-size: 0.74rem; color: var(--text-secondary); margin-top: 2px; }
+.lib-tags { display: flex; gap: var(--sp-2); margin-top: var(--sp-2); }
+.lib-tags .tag { font-size: 0.58rem; letter-spacing: 0.06em; text-transform: uppercase; font-weight: 600; color: var(--accent-deep); background: var(--accent-soft); padding: 3px 8px; border-radius: var(--r-pill); }
+.lib-actions { display: flex; gap: var(--sp-2); color: var(--text-muted); }
+.lib-actions span { cursor: pointer; font-size: 1.05rem; }
+.lib-actions .on { color: var(--accent); }
+
+/* ═══ READER ═══ */
+.reader { display: flex; flex-direction: column; flex: 1; background: var(--bg-reader); }
+.reader-top { display: grid; grid-template-columns: 40px 1fr 40px; align-items: center; padding: var(--sp-4) var(--sp-4); }
+.reader-top .pill { width: 40px; height: 40px; border-radius: 50%; background: var(--bg-card); box-shadow: var(--shadow-sm); display: flex; align-items: center; justify-content: center; color: var(--text-secondary); font-size: 1rem; cursor: pointer; }
+.reader-top .ch { text-align: center; }
+.reader-top .ch .t { font-size: 0.86rem; font-weight: 600; }
+.reader-top .ch .s { font-size: 0.66rem; color: var(--text-muted); }
+.reader-body { flex: 1; padding: var(--sp-6) var(--sp-6) var(--sp-8); font-family: var(--font-reader); font-size: 1.04rem; line-height: 1.75; color: var(--reader-text); }
+.reader-body p { margin-bottom: 1.15em; }
+.reader-body .beat { color: var(--reader-muted); }
+.reader-foot { padding: var(--sp-3) var(--sp-5) var(--sp-5); display: flex; justify-content: center; }
+.reader-dock { display: flex; align-items: center; gap: var(--sp-4); background: var(--bg-card); border-radius: var(--r-pill); padding: var(--sp-2) var(--sp-4); box-shadow: var(--shadow-md); }
+.reader-dock .nav { font-size: 1rem; color: var(--text-secondary); cursor: pointer; }
+.reader-dock .prog { display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 120px; }
+.reader-dock .prog .bar { width: 100%; height: 5px; background: var(--bg-chip); border-radius: var(--r-pill); overflow: hidden; }
+.reader-dock .prog .bar > i { display: block; height: 100%; width: 7%; background: var(--accent); }
+.reader-dock .prog .pg { font-size: 0.66rem; color: var(--text-muted); }
+
+/* ═══ SETTINGS ═══ */
+.settings { padding: var(--sp-5); flex: 1; }
+.sheet { background: var(--bg-card); border-radius: var(--r-xl); padding: var(--sp-6) var(--sp-5); box-shadow: var(--shadow-lg); }
+.sheet-handle { width: 38px; height: 4px; background: var(--bg-chip); border-radius: var(--r-pill); margin: 0 auto var(--sp-5); }
+.sheet-title { font-size: 1.2rem; font-weight: 600; display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--sp-5); }
+.sheet-title .x { width: 30px; height: 30px; border-radius: 50%; background: var(--bg-soft); display: flex; align-items: center; justify-content: center; font-size: 0.9rem; color: var(--text-muted); cursor: pointer; }
+.set-block { background: var(--bg-soft); border-radius: var(--r-md); padding: var(--sp-4); margin-bottom: var(--sp-3); }
+.set-lbl { font-size: 0.64rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); font-weight: 600; margin-bottom: var(--sp-3); }
+.fontsize { display: flex; align-items: center; justify-content: space-between; }
+.fontsize button { width: 40px; height: 40px; border-radius: 50%; border: none; background: var(--bg-card); box-shadow: var(--shadow-sm); font-size: 1.1rem; color: var(--text-primary); cursor: pointer; }
+.fontsize .aa { font-family: var(--font-reader); font-size: 1.5rem; }
+.seg { display: flex; background: var(--bg-card); border-radius: var(--r-pill); padding: 4px; box-shadow: var(--shadow-sm); }
+.seg .opt { flex: 1; text-align: center; font-size: 0.78rem; color: var(--text-secondary); padding: 8px; border-radius: var(--r-pill); cursor: pointer; }
+.seg .opt.on { background: var(--accent); color: #fff; font-weight: 600; }
+.themes { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp-3); }
+.theme { border-radius: var(--r-md); padding: var(--sp-3) var(--sp-2); text-align: center; cursor: pointer; box-shadow: var(--shadow-sm); }
+.theme .aa { font-family: var(--font-reader); font-size: 1.3rem; display: block; }
+.theme .nm { font-size: 0.62rem; margin-top: 4px; }
+.theme.on { outline: 2px solid var(--accent); outline-offset: 1px; }
+.t-original { background: #f8f6ef; color: #191817; }
+.t-quiet    { background: #4f4f54; color: #efedf0; }
+.t-paper    { background: #fffdf6; color: #1a1b1d; }
+.t-bold     { background: #fbfaf7; color: #050505; }
+.t-calm     { background: #fff7e6; color: #2b2116; }
+.t-focus    { background: #f3f6f3; color: #111; }
+.slider { display: flex; align-items: center; gap: var(--sp-3); margin-top: var(--sp-3); }
+.slider .sl-lbl { font-size: 0.74rem; color: var(--text-secondary); width: 110px; }
+.slider input[type=range] { flex: 1; accent-color: var(--accent); height: 4px; }
+.toggle-row { display: flex; align-items: center; justify-content: space-between; }
+.toggle-row .tg-lbl { font-size: 0.82rem; font-weight: 500; }
+.toggle { width: 44px; height: 26px; border-radius: var(--r-pill); background: var(--accent); position: relative; }
+.toggle::after { content: ''; position: absolute; top: 3px; left: 21px; width: 20px; height: 20px; border-radius: 50%; background: #fff; }
+
+/* ── Rationale ── */
+.rationale p { color: var(--text-secondary); font-size: 0.95rem; line-height: 1.75; max-width: 660px; }
+.rationale strong { color: var(--text-primary); }
+.rationale .fixes { list-style: none; margin-top: var(--sp-5); display: grid; gap: var(--sp-3); }
+.rationale .fixes li { background: var(--bg-card); border-radius: var(--r-md); padding: var(--sp-4); font-size: 0.9rem; color: var(--text-secondary); line-height: 1.5; box-shadow: var(--shadow-sm); }
+.rationale .fixes li strong { color: var(--text-primary); }
+
+@media (max-width: 760px) { .frames { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<div class="concept-header">
+  <div class="eyebrow">Minimalist Direction 2 of 3</div>
+  <h1>Haven</h1>
+  <p>Soft, calm minimalism. Gently elevated cards float on a warm-neutral wash, with one muted sage accent and plenty of breathing room — the mood of a quiet reading nook.</p>
+</div>
+
+<!-- PALETTE + TYPE -->
+<section class="section">
+  <div class="kicker">Palette — warm neutral, soft sage</div>
+  <h2>System</h2>
+  <div class="palette-grid">
+    <div class="swatch" style="background:#f1efe9"><span>App</span><span class="hex">#f1efe9</span></div>
+    <div class="swatch" style="background:#ffffff;border:1px solid var(--border)"><span>Card</span><span class="hex">#ffffff</span></div>
+    <div class="swatch" style="background:#faf8f3"><span>Reader</span><span class="hex">#faf8f3</span></div>
+    <div class="swatch" style="background:#5f8267"><span style="color:#fff">Sage</span><span class="hex" style="color:#e4ece4">#5f8267</span></div>
+    <div class="swatch" style="background:#2b2a26"><span style="color:#fff">Ink</span><span class="hex" style="color:#a4a199">#2b2a26</span></div>
+    <div class="swatch" style="background:#e4ece4"><span style="color:#4c6b54">Sage tint</span><span class="hex" style="color:#5f8267">#e4ece4</span></div>
+  </div>
+  <div class="type-spec">
+    <div class="row"><span class="lbl">Heading</span><span class="ex-h">The Friction of the Spark</span></div>
+    <div class="row"><span class="lbl">Reader</span><span class="ex-r">The house kept the morning at nineteen degrees.</span></div>
+    <div class="row"><span class="lbl">Interface</span><span class="ex-u">Continue · Library · Search</span></div>
+  </div>
+</section>
+
+<!-- SCREENS: HOME + LIBRARY -->
+<section class="section">
+  <div class="kicker">The two browse screens</div>
+  <h2>Home &amp; Library</h2>
+  <div class="frames">
+    <!-- HOME -->
+    <div>
+      <div class="frame-label">Home</div>
+      <div class="phone"><div class="screen">
+        <div class="home">
+          <div class="home-top">
+            <div class="home-greeting">Home</div>
+            <div class="goal-card">
+              <div class="ring"><div class="inner">3</div></div>
+              <div class="goal-text"><div class="g1">3 of 15 min</div><div class="g2">today · 0 finished</div></div>
+            </div>
+          </div>
+
+          <div class="sec-label"><span class="l">Continue</span></div>
+          <div class="hero">
+            <div class="hero-cover">The Friction<br>of the Spark</div>
+            <div class="hero-body">
+              <div class="title">The Friction of the Spark</div>
+              <div class="author">Shiminize</div>
+              <div class="meta">Chapter 1 · The Vacuum</div>
+              <div class="hero-bar"><i></i></div>
+              <div class="hero-resume">Resume · 4%</div>
+            </div>
+          </div>
+
+          <div class="sec-label"><span class="l">Top Picks</span><span class="m">View all</span></div>
+          <div class="picks">
+            <div class="pick">
+              <div class="pick-cover" style="background:linear-gradient(155deg,#5b1416,#1c0a0b)"></div>
+              <div class="pick-info"><div class="pt">Ready to continue</div><div class="pg">Dark romantic suspense</div></div>
+            </div>
+            <div class="pick">
+              <div class="pick-cover" style="background:linear-gradient(155deg,#1f3a2c,#0e1a14)"></div>
+              <div class="pick-info"><div class="pt">Want to Read</div><div class="pg">Structural Audit Notes</div></div>
+            </div>
+            <div class="pick">
+              <div class="pick-cover" style="background:linear-gradient(155deg,#6b1a1a,#2a0a0a)"></div>
+              <div class="pick-info"><div class="pt">Fits your shelf</div><div class="pg">Reader Sample</div></div>
+            </div>
+          </div>
+        </div>
+        <div class="nav-bar">
+          <div class="nav-item active"><span class="ic">⌂</span>Home</div>
+          <div class="nav-item"><span class="ic">▤</span>Library</div>
+          <div class="nav-item"><span class="ic">⌕</span>Search</div>
+        </div>
+      </div></div>
+    </div>
+
+    <!-- LIBRARY -->
+    <div>
+      <div class="frame-label">Library</div>
+      <div class="phone"><div class="screen">
+        <div class="lib">
+          <div class="lib-head"><h3>Library</h3><span class="count">3 items</span></div>
+          <div class="lib-filters">
+            <span class="f active">All</span>
+            <span class="f">Continue</span>
+            <span class="f">Want to Read</span>
+            <span class="f">Finished</span>
+            <span class="f">Samples</span>
+            <span class="f">PDFs</span>
+          </div>
+          <div class="lib-list">
+            <div class="lib-row">
+              <div class="lib-cover" style="background:linear-gradient(155deg,#5b1416,#1c0a0b)"></div>
+              <div class="lib-meta">
+                <div class="lt">The Friction of the Spark</div>
+                <div class="ls">Shiminize</div>
+                <div class="lib-tags"><span class="tag">Book</span><span class="tag">4% read</span></div>
+              </div>
+              <div class="lib-actions"><span class="on">★</span><span>✓</span></div>
+            </div>
+            <div class="lib-row">
+              <div class="lib-cover" style="background:linear-gradient(155deg,#1f3a2c,#0e1a14)"></div>
+              <div class="lib-meta">
+                <div class="lt">Structural Audit Notes</div>
+                <div class="ls">Project reference</div>
+                <div class="lib-tags"><span class="tag">PDF</span><span class="tag">Want to read</span></div>
+              </div>
+              <div class="lib-actions"><span>☆</span><span class="on">✓</span></div>
+            </div>
+            <div class="lib-row">
+              <div class="lib-cover" style="background:linear-gradient(155deg,#6b1a1a,#2a0a0a)"></div>
+              <div class="lib-meta">
+                <div class="lt">Reader Sample</div>
+                <div class="ls">Sample collection entry</div>
+                <div class="lib-tags"><span class="tag">Sample</span></div>
+              </div>
+              <div class="lib-actions"><span>☆</span><span>✓</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="nav-bar">
+          <div class="nav-item"><span class="ic">⌂</span>Home</div>
+          <div class="nav-item active"><span class="ic">▤</span>Library</div>
+          <div class="nav-item"><span class="ic">⌕</span>Search</div>
+        </div>
+      </div></div>
+    </div>
+  </div>
+</section>
+
+<!-- SCREENS: READER + SETTINGS -->
+<section class="section">
+  <div class="kicker">The reading surface &amp; its controls</div>
+  <h2>Reader &amp; Settings</h2>
+  <div class="frames">
+    <!-- READER -->
+    <div>
+      <div class="frame-label">Reader — one soft floating dock</div>
+      <div class="phone"><div class="screen reader">
+        <div class="reader-top">
+          <span class="pill">‹</span>
+          <div class="ch"><div class="t">The Vacuum</div><div class="s">Chapter 1</div></div>
+          <span class="pill">✕</span>
+        </div>
+        <div class="reader-body">
+          <p>The house kept the morning at nineteen degrees.</p>
+          <p class="beat">Not cool. Not warm. Correct.</p>
+          <p>Eline crossed the foyer by the marble seams, heel to edge, edge to heel, never cutting through the white center of a tile. The stone had been polished until it held the light without reflecting it. There were no soft places here.</p>
+          <p class="beat">Her shoes should have clicked.</p>
+          <p class="beat">They did not.</p>
+        </div>
+        <div class="reader-foot">
+          <div class="reader-dock">
+            <span class="nav">←</span>
+            <div class="prog"><div class="bar"><i></i></div><span class="pg">Page 1 of 14</span></div>
+            <span class="nav">→</span>
+          </div>
+        </div>
+      </div></div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div>
+      <div class="frame-label">Themes &amp; Settings</div>
+      <div class="phone"><div class="screen">
+        <div class="settings">
+          <div class="sheet">
+            <div class="sheet-handle"></div>
+            <div class="sheet-title">Themes &amp; Settings <span class="x">✕</span></div>
+
+            <div class="set-block">
+              <div class="set-lbl">Text size</div>
+              <div class="fontsize"><button>−</button><span class="aa">Aa</span><button>+</button></div>
+            </div>
+
+            <div class="set-block">
+              <div class="set-lbl">Page turn</div>
+              <div class="seg"><span class="opt">Curl</span><span class="opt on">Fast Fade</span><span class="opt">Scroll</span></div>
+            </div>
+
+            <div class="set-block">
+              <div class="set-lbl">Reader theme</div>
+              <div class="themes">
+                <div class="theme t-original on"><span class="aa">Aa</span><span class="nm">Original</span></div>
+                <div class="theme t-quiet"><span class="aa">Aa</span><span class="nm">Quiet</span></div>
+                <div class="theme t-paper"><span class="aa">Aa</span><span class="nm">Paper</span></div>
+                <div class="theme t-bold"><span class="aa">Aa</span><span class="nm">Bold</span></div>
+                <div class="theme t-calm"><span class="aa">Aa</span><span class="nm">Calm</span></div>
+                <div class="theme t-focus"><span class="aa">Aa</span><span class="nm">Focus</span></div>
+              </div>
+            </div>
+
+            <div class="set-block">
+              <div class="set-lbl">Customize</div>
+              <div class="toggle-row"><span class="tg-lbl">Bold text</span><span class="toggle"></span></div>
+              <div class="slider"><span class="sl-lbl">Line spacing</span><input type="range" min="0" max="100" value="55"></div>
+              <div class="slider"><span class="sl-lbl">Character spacing</span><input type="range" min="0" max="100" value="30"></div>
+              <div class="slider"><span class="sl-lbl">Brightness</span><input type="range" min="0" max="100" value="72"></div>
+            </div>
+          </div>
+        </div>
+      </div></div>
+    </div>
+  </div>
+</section>
+
+<!-- RATIONALE -->
+<section class="section rationale" style="padding-bottom:96px">
+  <div class="kicker">Why this direction</div>
+  <h2>Haven</h2>
+  <p><strong>Haven keeps the app warm and welcoming, but trades clutter for calm.</strong> Everything lives on one soft, rounded card system with gentle shadows and roomy padding — so the page feels organised and unhurried rather than busy. A single muted sage replaces the competing greens and reds; the only saturated colour left is the cover art itself.</p>
+  <ul class="fixes">
+    <li><strong>Continue is a single hero card</strong> with a clear "Resume · 4%" action — the rest of Home arranges quietly beneath it.</li>
+    <li><strong>One rounded card system everywhere.</strong> Top Picks and Library share the same soft surface, so nothing shouts louder than its neighbour.</li>
+    <li><strong>The reader collapses to one floating dock</strong> — progress bar, page count, and page turns in a single pill. No scattered circles.</li>
+    <li><strong>Sage tints carry state.</strong> Tags, active filters, and the goal ring all use one accent family at readable 12px+.</li>
+    <li><strong>Desktop centres the cards in a calm column</strong> with the goal and Continue side-by-side, filling the canvas intentionally.</li>
+  </ul>
+</section>
+
+</body>
+</html>

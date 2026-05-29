@@ -1,4 +1,13 @@
-const eventTypes = new Set(['session_start', 'book_open', 'page_view', 'progress', 'session_end']);
+const eventTypes = new Set([
+  'session_start',
+  'book_open',
+  'page_view',
+  'progress',
+  'session_end',
+  'reading_session_start',
+  'reading_session_heartbeat',
+  'reading_session_end'
+]);
 
 export function validateAnalyticsEvent(body) {
   if (!body || typeof body !== 'object') return { ok: false, error: 'invalid_body' };

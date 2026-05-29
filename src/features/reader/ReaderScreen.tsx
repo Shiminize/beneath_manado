@@ -402,7 +402,6 @@ export function ReaderScreen({ item, initialLocation, preferences, onClose, onPr
   return (
     <main
       className={readerShellClassName}
-      data-color-palette={preferences.colorPalette}
       data-reader-theme={preferences.theme}
       style={readerStyle}
     >
@@ -417,7 +416,7 @@ export function ReaderScreen({ item, initialLocation, preferences, onClose, onPr
               <List size={READER_MENU_ICON_SIZE} aria-hidden="true" />
               <span>Menu</span>
             </button>
-            <IconButton label="Close book" variant="filled" onClick={onClose}>
+            <IconButton label="Close book" variant="soft" onClick={onClose}>
               <X size={READER_CHROME_ICON_SIZE} />
             </IconButton>
           </div>
@@ -447,16 +446,16 @@ export function ReaderScreen({ item, initialLocation, preferences, onClose, onPr
 
       {chromeExpanded && (
         <footer className="reader-footer">
-          <IconButton label="Previous page" variant="filled" onClick={goPrevious} disabled={location.chapterIndex === 0 && safePageIndex === 0}>
+          <IconButton label="Previous page" variant="soft" onClick={goPrevious} disabled={location.chapterIndex === 0 && safePageIndex === 0}>
             <ArrowLeft size={READER_CHROME_ICON_SIZE} />
           </IconButton>
           <div className="reader-page-count">
             {effectivePageTurnMode === 'scroll' ? `${location.chapterIndex + 1} of ${item.content.length}` : `${safePageIndex + 1} of ${pages.length}`}
           </div>
-          <IconButton label="Open reader menu" className="reader-mobile-menu-button" variant="filled" onClick={() => setMenuOpen(true)}>
+          <IconButton label="Open reader menu" className="reader-mobile-menu-button" variant="soft" onClick={() => setMenuOpen(true)}>
             <List size={READER_MENU_ICON_SIZE} />
           </IconButton>
-          <IconButton label="Next page" variant="filled" onClick={goNext} disabled={location.chapterIndex === item.content.length - 1 && safePageIndex === pages.length - 1}>
+          <IconButton label="Next page" variant="soft" onClick={goNext} disabled={location.chapterIndex === item.content.length - 1 && safePageIndex === pages.length - 1}>
             <ArrowRight size={READER_CHROME_ICON_SIZE} />
           </IconButton>
         </footer>

@@ -46,7 +46,9 @@ export function getRouteParam(request, key) {
   const parts = url.pathname.split('/').filter(Boolean);
   if (key !== 'bookId') return undefined;
   const booksIndex = parts.indexOf('books');
-  return booksIndex === -1 ? undefined : parts[booksIndex + 1];
+  if (booksIndex === -1) return undefined;
+  const value = parts[booksIndex + 1];
+  return value === undefined ? undefined : decodeURIComponent(value);
 }
 
 export function getQueryParam(request, key, fallback) {

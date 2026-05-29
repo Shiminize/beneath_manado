@@ -5,24 +5,31 @@
   display: grid;
   place-items: center;
   padding: var(--space-5);
-  background: var(--app-scrim);
+  background: var(--surface-scrim);
   backdrop-filter: blur(var(--space-2));
 }
 
 .access-panel {
-  width: min(var(--generated-length-420px), var(--generated-length-100pct));
+  width: min(var(--width-dialog), var(--size-full));
   display: grid;
   gap: var(--space-4);
   padding: var(--space-6);
+  border: var(--stroke-hairline) solid var(--border-subtle);
   border-radius: var(--radius-ui);
   background: var(--surface-floating);
-  color: var(--app-ink);
-  box-shadow: var(--shadow-float);
+  color: var(--text-primary);
+  box-shadow: var(--shadow-raised);
 }
 
 .access-panel h1,
 .access-panel p {
   margin: var(--space-0);
+}
+
+.access-panel h1 {
+  font-family: var(--font-display);
+  font-weight: 500;
+  letter-spacing: var(--tracking-tight);
 }
 
 .access-form {
@@ -32,14 +39,14 @@
 
 .access-form input,
 .admin-login input,
-.admin-book-row input,
-.admin-toolbar select {
+.admin-password-control input,
+.admin-range-control select {
   min-height: var(--target-md);
-  border: var(--generated-length-1px) solid var(--app-border);
+  border: var(--stroke-hairline) solid var(--border-subtle);
   border-radius: var(--radius-ui);
   padding: var(--space-3);
   background: var(--surface-field);
-  color: var(--app-ink);
+  color: var(--text-primary);
   font: inherit;
 }
 
@@ -60,6 +67,6 @@
 
 .access-error,
 .admin-message {
-  color: var(--app-accent-strong);
+  color: var(--action-danger);
   font-size: var(--text-ui-sm);
 }

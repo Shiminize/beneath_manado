@@ -57,13 +57,13 @@ export function LineGuideOverlay({ preferences, lineGuideAnchors, onChange, onSt
         onPointerDown={(event) => event.stopPropagation()}
         onPointerUp={(event) => event.stopPropagation()}
       >
-        <IconButton label="Move line guide to previous line" variant="filled" onClick={() => onStep('previous')}>
+        <IconButton label="Move line guide to previous line" variant="soft" onClick={() => onStep('previous')}>
           <ChevronUp size={LINE_GUIDE_ICON_SIZE} />
         </IconButton>
-        <IconButton label="Turn line guide off" variant="filled" onClick={() => onChange({ lineGuideEnabled: false })}>
+        <IconButton label="Turn line guide off" variant="soft" onClick={() => onChange({ lineGuideEnabled: false })}>
           <X size={LINE_GUIDE_ICON_SIZE} />
         </IconButton>
-        <IconButton label="Move line guide to next line" variant="filled" onClick={() => onStep('next')}>
+        <IconButton label="Move line guide to next line" variant="soft" onClick={() => onStep('next')}>
           <ChevronDown size={LINE_GUIDE_ICON_SIZE} />
         </IconButton>
       </div>

@@ -9,5 +9,11 @@
       "source": "/admin",
       "destination": "/index.html"
     }
+  ],
+  "crons": [
+    {
+      "path": "/api/cron/retention",
+      "schedule": "0 4 * * *"
+    }
   ]
 }

@@ -5,84 +5,56 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
 
-  --surface-app: var(--palette-parchment-app-bg);
-  --surface-panel: var(--palette-parchment-panel);
-  --surface-panel-soft: var(--palette-parchment-panel-soft);
-  --surface-panel-strong: var(--palette-parchment-panel-strong);
-  --surface-floating: var(--palette-parchment-floating);
-  --surface-floating-soft: var(--palette-parchment-floating-soft);
-  --surface-chip: var(--palette-parchment-chip);
-  --surface-field: var(--palette-parchment-field);
-  --surface-sheet: var(--palette-parchment-sheet);
-  --surface-app-wash: var(--palette-parchment-app-wash);
-  --surface-scrim: var(--palette-parchment-scrim);
-  --text-primary: var(--palette-parchment-text);
-  --text-inverse: var(--color-neutral-0);
-  --text-muted: var(--palette-parchment-muted);
-  --border-subtle: var(--palette-parchment-border-subtle);
-  --border-strong: var(--palette-parchment-border-strong);
-  --border-reader-subtle: var(--palette-parchment-reader-border);
-  --action-primary: var(--palette-parchment-action);
-  --action-primary-text: var(--palette-parchment-action-text);
-  --action-danger: var(--color-accent-red-700);
-  --action-info: var(--color-accent-cyan-500);
-  --control-track: var(--palette-parchment-border-subtle);
-  --control-row: var(--palette-parchment-panel-soft);
-  --control-active: var(--palette-parchment-text);
-  --control-active-text: var(--palette-parchment-panel);
-  --focus-color: var(--palette-parchment-action);
-  --line-guide-dim-high: var(--palette-parchment-guide-high);
-  --line-guide-dim-medium: var(--palette-parchment-guide-medium);
-  --line-guide-dim-low: var(--palette-parchment-guide-low);
+  /* Surfaces */
+  --surface-app: var(--bg-app);
+  --surface-panel: var(--bg-panel);
+  --surface-panel-soft: var(--bg-panel-soft);
+  --surface-panel-strong: var(--bg-panel-strong);
+  --surface-floating: var(--bg-panel);
+  --surface-floating-soft: var(--bg-panel-soft);
+  --surface-chip: var(--bg-chip);
+  --surface-field: var(--bg-panel);
+  --surface-sheet: var(--bg-panel);
+  --surface-app-wash: var(--app-wash);
+  --surface-scrim: var(--scrim);
+
+  /* Ink */
+  --text-primary: var(--ink);
+  --text-secondary: var(--ink-secondary);
+  --text-muted: var(--ink-muted);
+  --text-inverse: var(--ivory);
+
+  /* Rules — hairlines carry structure, not boxes */
+  --border-subtle: var(--rule);
+  --border-strong: var(--rule-strong);
+  --border-reader-subtle: var(--rule);
+
+  /* Actions — one claret accent */
+  --action-primary: var(--accent);
+  --action-primary-text: var(--ivory);
+  --action-danger: var(--color-danger);
+  --action-info: var(--color-info);
+
+  /* Controls */
+  --control-track: var(--rule);
+  --control-row: var(--bg-panel-soft);
+  --control-active: var(--ink);
+  --control-active-text: var(--ivory);
+  --focus-color: var(--accent);
+
+  /* Line guide (light) */
+  --line-guide-dim-high: var(--guide-tint-high);
+  --line-guide-dim-medium: var(--guide-tint-medium);
+  --line-guide-dim-low: var(--guide-tint-low);
   --line-guide-dim-none: transparent;
 
-  /* Legacy aliases preserved during migration. */
-  --app-bg: var(--surface-app);
-  --app-surface: var(--surface-panel);
-  --app-surface-strong: var(--surface-panel-strong);
-  --app-ink: var(--text-primary);
-  --app-muted: var(--text-muted);
-  --app-subtle: var(--surface-chip);
-  --app-accent: var(--action-primary);
-  --app-accent-strong: var(--action-danger);
-  --app-cyan: var(--action-info);
-  --app-shadow: var(--shadow-float);
-}
-
-:where(.app-shell, .reader-shell) {
-  --surface-app: var(--palette-active-app-bg, var(--palette-sage-app-bg));
-  --surface-panel: var(--palette-active-panel, var(--palette-sage-panel));
-  --surface-panel-soft: var(--palette-active-panel-soft, var(--palette-sage-panel-soft));
-  --surface-panel-strong: var(--palette-active-panel-strong, var(--palette-sage-panel-strong));
-  --surface-floating: var(--palette-active-floating, var(--palette-sage-floating));
-  --surface-floating-soft: var(--palette-active-floating-soft, var(--palette-sage-floating-soft));
-  --surface-chip: var(--palette-active-chip, var(--palette-sage-chip));
-  --surface-field: var(--palette-active-field, var(--palette-sage-field));
-  --surface-sheet: var(--palette-active-sheet, var(--palette-sage-sheet));
-  --surface-app-wash: var(--palette-active-app-wash, var(--palette-sage-app-wash));
-  --surface-scrim: var(--palette-active-scrim, var(--palette-sage-scrim));
-  --text-primary: var(--palette-active-text, var(--palette-sage-text));
-  --text-muted: var(--palette-active-muted, var(--palette-sage-muted));
-  --border-subtle: var(--palette-active-border-subtle, var(--palette-sage-border-subtle));
-  --border-strong: var(--palette-active-border-strong, var(--palette-sage-border-strong));
-  --border-reader-subtle: var(--palette-active-reader-border, var(--palette-sage-reader-border));
-  --action-primary: var(--palette-active-action, var(--palette-sage-action));
-  --action-primary-text: var(--palette-active-action-text, var(--palette-sage-action-text));
-  --control-track: var(--palette-active-border-subtle, var(--palette-sage-border-subtle));
-  --control-row: var(--palette-active-panel-soft, var(--palette-sage-panel-soft));
-  --control-active: var(--palette-active-text, var(--palette-sage-text));
-  --control-active-text: var(--palette-active-panel, var(--palette-sage-panel));
-  --focus-color: var(--palette-active-action, var(--palette-sage-action));
-  --line-guide-dim-high: var(--palette-active-guide-high, var(--palette-sage-guide-high));
-  --line-guide-dim-medium: var(--palette-active-guide-medium, var(--palette-sage-guide-medium));
-  --line-guide-dim-low: var(--palette-active-guide-low, var(--palette-sage-guide-low));
-  --line-guide-dim-none: transparent;
-  --reader-bg: var(--palette-active-reader-bg, var(--palette-sage-reader-bg));
-  --reader-panel: var(--palette-active-reader-panel, var(--palette-sage-reader-panel));
-  --reader-text: var(--palette-active-reader-text, var(--palette-sage-reader-text));
-  --reader-muted: var(--palette-active-reader-muted, var(--palette-sage-reader-muted));
-  --reader-border: var(--palette-active-reader-border, var(--palette-sage-reader-border));
-  --reader-highlight: var(--palette-active-reader-highlight, var(--palette-sage-reader-highlight));
+  /* Reader surface (light default) */
+  --reader-bg: var(--bg-reader);
+  --reader-panel: var(--bg-panel);
+  --reader-text: var(--reader-text-ink);
+  --reader-muted: var(--ink-muted);
+  --reader-border: var(--rule);
+  --reader-highlight: var(--reader-highlight-light);
   --guide-overlay: var(--line-guide-dim-medium);
 
   /* Legacy aliases preserved during migration. */
@@ -98,250 +70,52 @@
   --app-shadow: var(--shadow-float);
 }
 
-:where(.app-shell, .reader-shell)[data-color-palette='sage'] {
-  --palette-active-app-bg: var(--palette-sage-app-bg);
-  --palette-active-panel: var(--palette-sage-panel);
-  --palette-active-panel-soft: var(--palette-sage-panel-soft);
-  --palette-active-panel-strong: var(--palette-sage-panel-strong);
-  --palette-active-floating: var(--palette-sage-floating);
-  --palette-active-floating-soft: var(--palette-sage-floating-soft);
-  --palette-active-chip: var(--palette-sage-chip);
-  --palette-active-field: var(--palette-sage-field);
-  --palette-active-sheet: var(--palette-sage-sheet);
-  --palette-active-app-wash: var(--palette-sage-app-wash);
-  --palette-active-scrim: var(--palette-sage-scrim);
-  --palette-active-text: var(--palette-sage-text);
-  --palette-active-muted: var(--palette-sage-muted);
-  --palette-active-border-subtle: var(--palette-sage-border-subtle);
-  --palette-active-border-strong: var(--palette-sage-border-strong);
-  --palette-active-action: var(--palette-sage-action);
-  --palette-active-action-text: var(--palette-sage-action-text);
-  --palette-active-reader-bg: var(--palette-sage-reader-bg);
-  --palette-active-reader-panel: var(--palette-sage-reader-panel);
-  --palette-active-reader-text: var(--palette-sage-reader-text);
-  --palette-active-reader-muted: var(--palette-sage-reader-muted);
-  --palette-active-reader-border: var(--palette-sage-reader-border);
-  --palette-active-reader-highlight: var(--palette-sage-reader-highlight);
-  --palette-active-guide-high: var(--palette-sage-guide-high);
-  --palette-active-guide-medium: var(--palette-sage-guide-medium);
-  --palette-active-guide-low: var(--palette-sage-guide-low);
-}
-
-:where(.app-shell, .reader-shell)[data-color-palette='oxide'] {
-  --palette-active-app-bg: var(--palette-oxide-app-bg);
-  --palette-active-panel: var(--palette-oxide-panel);
-  --palette-active-panel-soft: var(--palette-oxide-panel-soft);
-  --palette-active-panel-strong: var(--palette-oxide-panel-strong);
-  --palette-active-floating: var(--palette-oxide-floating);
-  --palette-active-floating-soft: var(--palette-oxide-floating-soft);
-  --palette-active-chip: var(--palette-oxide-chip);
-  --palette-active-field: var(--palette-oxide-field);
-  --palette-active-sheet: var(--palette-oxide-sheet);
-  --palette-active-app-wash: var(--palette-oxide-app-wash);
-  --palette-active-scrim: var(--palette-oxide-scrim);
-  --palette-active-text: var(--palette-oxide-text);
-  --palette-active-muted: var(--palette-oxide-muted);
-  --palette-active-border-subtle: var(--palette-oxide-border-subtle);
-  --palette-active-border-strong: var(--palette-oxide-border-strong);
-  --palette-active-action: var(--palette-oxide-action);
-  --palette-active-action-text: var(--palette-oxide-action-text);
-  --palette-active-reader-bg: var(--palette-oxide-reader-bg);
-  --palette-active-reader-panel: var(--palette-oxide-reader-panel);
-  --palette-active-reader-text: var(--palette-oxide-reader-text);
-  --palette-active-reader-muted: var(--palette-oxide-reader-muted);
-  --palette-active-reader-border: var(--palette-oxide-reader-border);
-  --palette-active-reader-highlight: var(--palette-oxide-reader-highlight);
-  --palette-active-guide-high: var(--palette-oxide-guide-high);
-  --palette-active-guide-medium: var(--palette-oxide-guide-medium);
-  --palette-active-guide-low: var(--palette-oxide-guide-low);
-}
-
-:where(.app-shell, .reader-shell)[data-color-palette='noir'] {
-  --palette-active-app-bg: var(--palette-noir-app-bg);
-  --palette-active-panel: var(--palette-noir-panel);
-  --palette-active-panel-soft: var(--palette-noir-panel-soft);
-  --palette-active-panel-strong: var(--palette-noir-panel-strong);
-  --palette-active-floating: var(--palette-noir-floating);
-  --palette-active-floating-soft: var(--palette-noir-floating-soft);
-  --palette-active-chip: var(--palette-noir-chip);
-  --palette-active-field: var(--palette-noir-field);
-  --palette-active-sheet: var(--palette-noir-sheet);
-  --palette-active-app-wash: var(--palette-noir-app-wash);
-  --palette-active-scrim: var(--palette-noir-scrim);
-  --palette-active-text: var(--palette-noir-text);
-  --palette-active-muted: var(--palette-noir-muted);
-  --palette-active-border-subtle: var(--palette-noir-border-subtle);
-  --palette-active-border-strong: var(--palette-noir-border-strong);
-  --palette-active-action: var(--palette-noir-action);
-  --palette-active-action-text: var(--palette-noir-action-text);
-  --palette-active-reader-bg: var(--palette-noir-reader-bg);
-  --palette-active-reader-panel: var(--palette-noir-reader-panel);
-  --palette-active-reader-text: var(--palette-noir-reader-text);
-  --palette-active-reader-muted: var(--palette-noir-reader-muted);
-  --palette-active-reader-border: var(--palette-noir-reader-border);
-  --palette-active-reader-highlight: var(--palette-noir-reader-highlight);
-  --palette-active-guide-high: var(--palette-noir-guide-high);
-  --palette-active-guide-medium: var(--palette-noir-guide-medium);
-  --palette-active-guide-low: var(--palette-noir-guide-low);
-}
-
-:where(.app-shell, .reader-shell)[data-color-palette='rose'] {
-  --palette-active-app-bg: var(--palette-rose-app-bg);
-  --palette-active-panel: var(--palette-rose-panel);
-  --palette-active-panel-soft: var(--palette-rose-panel-soft);
-  --palette-active-panel-strong: var(--palette-rose-panel-strong);
-  --palette-active-floating: var(--palette-rose-floating);
-  --palette-active-floating-soft: var(--palette-rose-floating-soft);
-  --palette-active-chip: var(--palette-rose-chip);
-  --palette-active-field: var(--palette-rose-field);
-  --palette-active-sheet: var(--palette-rose-sheet);
-  --palette-active-app-wash: var(--palette-rose-app-wash);
-  --palette-active-scrim: var(--palette-rose-scrim);
-  --palette-active-text: var(--palette-rose-text);
-  --palette-active-muted: var(--palette-rose-muted);
-  --palette-active-border-subtle: var(--palette-rose-border-subtle);
-  --palette-active-border-strong: var(--palette-rose-border-strong);
-  --palette-active-action: var(--palette-rose-action);
-  --palette-active-action-text: var(--palette-rose-action-text);
-  --palette-active-reader-bg: var(--palette-rose-reader-bg);
-  --palette-active-reader-panel: var(--palette-rose-reader-panel);
-  --palette-active-reader-text: var(--palette-rose-reader-text);
-  --palette-active-reader-muted: var(--palette-rose-reader-muted);
-  --palette-active-reader-border: var(--palette-rose-reader-border);
-  --palette-active-reader-highlight: var(--palette-rose-reader-highlight);
-  --palette-active-guide-high: var(--palette-rose-guide-high);
-  --palette-active-guide-medium: var(--palette-rose-guide-medium);
-  --palette-active-guide-low: var(--palette-rose-guide-low);
-}
-
-:where(.app-shell, .reader-shell)[data-color-palette='dusk'] {
-  color-scheme: dark;
-  --palette-active-app-bg: var(--palette-dusk-app-bg);
-  --palette-active-panel: var(--palette-dusk-panel);
-  --palette-active-panel-soft: var(--palette-dusk-panel-soft);
-  --palette-active-panel-strong: var(--palette-dusk-panel-strong);
-  --palette-active-floating: var(--palette-dusk-floating);
-  --palette-active-floating-soft: var(--palette-dusk-floating-soft);
-  --palette-active-chip: var(--palette-dusk-chip);
-  --palette-active-field: var(--palette-dusk-field);
-  --palette-active-sheet: var(--palette-dusk-sheet);
-  --palette-active-app-wash: var(--palette-dusk-app-wash);
-  --palette-active-scrim: var(--palette-dusk-scrim);
-  --palette-active-text: var(--palette-dusk-text);
-  --palette-active-muted: var(--palette-dusk-muted);
-  --palette-active-border-subtle: var(--palette-dusk-border-subtle);
-  --palette-active-border-strong: var(--palette-dusk-border-strong);
-  --palette-active-action: var(--palette-dusk-action);
-  --palette-active-action-text: var(--palette-dusk-action-text);
-  --palette-active-reader-bg: var(--palette-dusk-reader-bg);
-  --palette-active-reader-panel: var(--palette-dusk-reader-panel);
-  --palette-active-reader-text: var(--palette-dusk-reader-text);
-  --palette-active-reader-muted: var(--palette-dusk-reader-muted);
-  --palette-active-reader-border: var(--palette-dusk-reader-border);
-  --palette-active-reader-highlight: var(--palette-dusk-reader-highlight);
-  --palette-active-guide-high: var(--palette-dusk-guide-high);
-  --palette-active-guide-medium: var(--palette-dusk-guide-medium);
-  --palette-active-guide-low: var(--palette-dusk-guide-low);
-}
-
-:where(.app-shell, .reader-shell)[data-color-palette='marine'] {
-  --palette-active-app-bg: var(--palette-marine-app-bg);
-  --palette-active-panel: var(--palette-marine-panel);
-  --palette-active-panel-soft: var(--palette-marine-panel-soft);
-  --palette-active-panel-strong: var(--palette-marine-panel-strong);
-  --palette-active-floating: var(--palette-marine-floating);
-  --palette-active-floating-soft: var(--palette-marine-floating-soft);
-  --palette-active-chip: var(--palette-marine-chip);
-  --palette-active-field: var(--palette-marine-field);
-  --palette-active-sheet: var(--palette-marine-sheet);
-  --palette-active-app-wash: var(--palette-marine-app-wash);
-  --palette-active-scrim: var(--palette-marine-scrim);
-  --palette-active-text: var(--palette-marine-text);
-  --palette-active-muted: var(--palette-marine-muted);
-  --palette-active-border-subtle: var(--palette-marine-border-subtle);
-  --palette-active-border-strong: var(--palette-marine-border-strong);
-  --palette-active-action: var(--palette-marine-action);
-  --palette-active-action-text: var(--palette-marine-action-text);
-  --palette-active-reader-bg: var(--palette-marine-reader-bg);
-  --palette-active-reader-panel: var(--palette-marine-reader-panel);
-  --palette-active-reader-text: var(--palette-marine-reader-text);
-  --palette-active-reader-muted: var(--palette-marine-reader-muted);
-  --palette-active-reader-border: var(--palette-marine-reader-border);
-  --palette-active-reader-highlight: var(--palette-marine-reader-highlight);
-  --palette-active-guide-high: var(--palette-marine-guide-high);
-  --palette-active-guide-medium: var(--palette-marine-guide-medium);
-  --palette-active-guide-low: var(--palette-marine-guide-low);
-}
-
-:where(.app-shell, .reader-shell)[data-color-palette='parchment'] {
-  --palette-active-app-bg: var(--palette-parchment-app-bg);
-  --palette-active-panel: var(--palette-parchment-panel);
-  --palette-active-panel-soft: var(--palette-parchment-panel-soft);
-  --palette-active-panel-strong: var(--palette-parchment-panel-strong);
-  --palette-active-floating: var(--palette-parchment-floating);
-  --palette-active-floating-soft: var(--palette-parchment-floating-soft);
-  --palette-active-chip: var(--palette-parchment-chip);
-  --palette-active-field: var(--palette-parchment-field);
-  --palette-active-sheet: var(--palette-parchment-sheet);
-  --palette-active-app-wash: var(--palette-parchment-app-wash);
-  --palette-active-scrim: var(--palette-parchment-scrim);
-  --palette-active-text: var(--palette-parchment-text);
-  --palette-active-muted: var(--palette-parchment-muted);
-  --palette-active-border-subtle: var(--palette-parchment-border-subtle);
-  --palette-active-border-strong: var(--palette-parchment-border-strong);
-  --palette-active-action: var(--palette-parchment-action);
-  --palette-active-action-text: var(--palette-parchment-action-text);
-  --palette-active-reader-bg: var(--palette-parchment-reader-bg);
-  --palette-active-reader-panel: var(--palette-parchment-reader-panel);
-  --palette-active-reader-text: var(--palette-parchment-reader-text);
-  --palette-active-reader-muted: var(--palette-parchment-reader-muted);
-  --palette-active-reader-border: var(--palette-parchment-reader-border);
-  --palette-active-reader-highlight: var(--palette-parchment-reader-highlight);
-  --palette-active-guide-high: var(--palette-parchment-guide-high);
-  --palette-active-guide-medium: var(--palette-parchment-guide-medium);
-  --palette-active-guide-low: var(--palette-parchment-guide-low);
-}
-
 .reader-shell {
   --reader-theme-font: var(--font-reader-literata);
   --reader-measure: var(--measure-reader-comfort);
   --reader-type-weight: var(--weight-reader-book);
 }
 
-.reader-shell[data-reader-theme='quiet'] {
-  --reader-bg: var(--color-reader-quiet-bg);
-  --reader-panel: var(--color-reader-quiet-panel);
-  --reader-text: var(--color-reader-quiet-text);
-  --reader-muted: var(--color-reader-quiet-muted);
-  --reader-border: var(--generated-color-rgba-255-255-255-0neg-14);
-  --reader-highlight: var(--generated-color-rgba-255-255-255-0neg-16);
-  --guide-overlay: var(--generated-color-rgba-79-79-84-0neg-72);
-  --reader-theme-font: var(--font-reader-literata);
-  --reader-measure: var(--measure-reader-comfort);
-  --reader-type-weight: var(--weight-reader-dark);
-  --focus-color: var(--color-focus-quiet);
+/* Light is the :root default; this selector documents the curated set. */
+.reader-shell[data-reader-theme='light'] {
+  --reader-bg: var(--bg-reader);
+  --reader-panel: var(--bg-panel);
+  --reader-text: var(--reader-text-ink);
+  --reader-muted: var(--ink-muted);
+  --reader-border: var(--rule);
+  --reader-highlight: var(--reader-highlight-light);
+  --guide-overlay: var(--line-guide-dim-medium);
+}
+
+.reader-shell[data-reader-theme='dark'] {
   color-scheme: dark;
+  --reader-bg: var(--reader-dark-bg);
+  --reader-panel: var(--reader-dark-panel);
+  --reader-text: var(--reader-dark-text);
+  --reader-muted: var(--reader-dark-muted);
+  --reader-border: var(--reader-dark-border);
+  --reader-highlight: var(--reader-dark-highlight);
+  --line-guide-dim-high: var(--reader-dark-guide-high);
+  --line-guide-dim-medium: var(--reader-dark-guide-medium);
+  --line-guide-dim-low: var(--reader-dark-guide-low);
+  --guide-overlay: var(--line-guide-dim-medium);
+  --accent: var(--reader-dark-accent);
+  --focus-color: var(--reader-dark-accent);
+  --reader-theme-font: var(--font-reader-literata);
+  --reader-type-weight: var(--weight-reader-dark);
 }
 
-.reader-shell[data-reader-theme='paper'] {
-  --reader-theme-font: var(--font-reader-editorial);
-  --reader-measure: var(--measure-reader-comfort);
-  --reader-type-weight: var(--weight-reader-book);
-}
-
-.reader-shell[data-reader-theme='bold'] {
-  --reader-theme-font: var(--font-reader-accessible);
-  --reader-measure: var(--measure-reader-tight);
-  --reader-type-weight: var(--weight-reader-accessible);
-}
-
-.reader-shell[data-reader-theme='calm'] {
-  --reader-theme-font: var(--font-reader-editorial);
-  --reader-measure: var(--measure-reader-comfort);
-  --reader-type-weight: var(--weight-reader-book);
-}
-
-.reader-shell[data-reader-theme='focus'] {
+.reader-shell[data-reader-theme='contrast'] {
+  --reader-bg: var(--reader-contrast-bg);
+  --reader-panel: var(--reader-contrast-bg);
+  --reader-text: var(--reader-contrast-text);
+  --reader-muted: var(--reader-contrast-muted);
+  --reader-border: var(--reader-contrast-border);
+  --reader-highlight: var(--reader-contrast-highlight);
+  --line-guide-dim-high: var(--reader-contrast-guide-high);
+  --line-guide-dim-medium: var(--reader-contrast-guide-medium);
+  --line-guide-dim-low: var(--reader-contrast-guide-low);
+  --guide-overlay: var(--line-guide-dim-medium);
   --reader-theme-font: var(--font-reader-accessible);
   --reader-measure: var(--measure-reader-tight);
   --reader-type-weight: var(--weight-reader-accessible);

@@ -1,11 +1,25 @@
 import { readdir, readFile } from 'node:fs/promises';
 import path from 'node:path';
 
+/*
+ * Folio geometry policy.
+ *
+ * The Folio system is built from hairline rules and small, crisp radii, with
+ * pills reserved for the nav, toggles, and chip rails and full circles for
+ * covers and avatars. Structure comes from borders, so normal-state borders
+ * are allowed — raw border widths and colours are already blocked by
+ * check:css-values, which keeps every stroke tokenised.
+ *
+ * This guard therefore enforces a single rule: every `border-radius` must come
+ * from a semantic `--radius-*` token (or be `inherit` / `0`). Raw radius
+ * lengths and percentages are caught by check:css-values.
+ */
+
 const activeRoots = ['src/styles'];
 const targetExtensions = new Set(['.css']);
 const approvedRawValueFiles = new Set([normalize('src/styles/tokens.css')]);
-const approvedRadiusTokens = ['--radius-ui', '--radius-ui-sm', '--radius-ui-none'];
-const ringRadiusToken = '--radius-ring';
+const radiusTokenPattern = /var\(\s*--radius-[a-z0-9-]+\s*\)/;
+const allowedLiteralRadii = new Set(['inherit', '0']);
 
 const files = [];
 for (const root of activeRoots) {
@@ -19,46 +33,22 @@ for (const file of files) {
 
   const source = await readFile(file, 'utf8');
   const lines = source.split('\n');
-  let currentSelector = '';
 
   for (const [index, rawLine] of lines.entries()) {
     const line = rawLine.trim();
+    if (!line.startsWith('border-radius:')) continue;
 
-    if (line.endsWith('{')) {
-      currentSelector = line.slice(0, -1).trim();
-      continue;
-    }
+    const value = line.slice('border-radius:'.length).replace(/;.*$/, '').trim();
+    if (allowedLiteralRadii.has(value)) continue;
+    if (radiusTokenPattern.test(value)) continue;
 
-    if (line === '}') {
-      currentSelector = '';
-      continue;
-    }
-
-    if (line.includes('--radius-pill') || line.includes('--radius-round')) {
-      addViolation(normalizedFile, index, 'disallowed-radius-token', line, 'Use small semantic geometry tokens instead of pill or round radius tokens.');
-    }
-
-    if (line.startsWith('border-radius:')) {
-      const usesApprovedRadius = approvedRadiusTokens.some((token) => line.includes(token));
-      const usesRingRadius = line.includes(ringRadiusToken);
-      const usesRawCircle = line.includes('50%');
-
-      if (usesRawCircle) {
-        addViolation(normalizedFile, index, 'raw-circle-radius', line, 'Use --radius-ring only for true circular progress rings.');
-      }
-
-      if (usesRingRadius && !currentSelector.includes('.goal-ring')) {
-        addViolation(normalizedFile, index, 'ring-radius-outside-ring', line, 'Reserve --radius-ring for the reading goal progress ring.');
-      }
-
-      if (!usesApprovedRadius && !usesRingRadius) {
-        addViolation(normalizedFile, index, 'non-semantic-radius', line, 'Use --radius-ui, --radius-ui-sm, --radius-ui-none, or the approved ring token.');
-      }
-    }
-
-    if (/^border(?:-(?:top|right|bottom|left))?\s*:/.test(line) && !/^border(?:-(?:top|right|bottom|left))?\s*:\s*0\s*;?$/.test(line)) {
-      addViolation(normalizedFile, index, 'decorative-border', line, 'Remove normal-state decorative borders; use surface contrast, shadow, or focus outlines.');
-    }
+    addViolation(
+      normalizedFile,
+      index,
+      'non-semantic-radius',
+      line,
+      'Use a semantic --radius-* token (or inherit/0) for border-radius.'
+    );
   }
 }
 
