@@ -1,11 +1,11 @@
 import type {
   AppState,
   Collection,
-  ColorPalette,
   LibraryItem,
   PageTurnMode,
   ReaderFontFamily,
   ReaderPreferences,
+  ReaderTheme,
   ReadingGoal,
   ReadingProgress,
   ReadingStatus
@@ -14,8 +14,17 @@ import type {
 const STORAGE_KEY = 'friction-reader-state-v1';
 const STATE_VERSION = 1;
 const readerFontFamilies = new Set<ReaderFontFamily>(['theme', 'literata', 'source-serif', 'atkinson', 'georgia', 'palatino']);
-const colorPalettes = new Set<ColorPalette>(['sage', 'oxide', 'noir', 'rose', 'dusk', 'marine', 'parchment']);
+const readerThemes = new Set<ReaderTheme>(['light', 'dark', 'contrast']);
 const pageTurnModes = new Set<PageTurnMode>(['fade', 'scroll']);
+
+const legacyReaderThemes: Record<string, ReaderTheme> = {
+  original: 'light',
+  paper: 'light',
+  calm: 'light',
+  focus: 'light',
+  quiet: 'dark',
+  bold: 'contrast'
+};
 
 interface StoredState {
   version: number;
@@ -23,8 +32,7 @@ interface StoredState {
 }
 
 export const defaultPreferences: ReaderPreferences = {
-  theme: 'original',
-  colorPalette: 'parchment',
+  theme: 'light',
   fontSize: 18,
   fontFamily: 'palatino',
   boldText: false,
@@ -154,17 +162,18 @@ function normalizePreferences(preferences: Partial<ReaderPreferences> | undefine
   const merged = { ...defaultPreferences, ...preferences };
   return {
     ...merged,
-    colorPalette: normalizeColorPalette(merged.colorPalette),
+    theme: normalizeReaderTheme(merged.theme),
     fontFamily: normalizeReaderFontFamily(merged.fontFamily),
     pageTurnMode: normalizePageTurnMode(merged.pageTurnMode)
   };
 }
 
-function normalizeColorPalette(colorPalette: unknown): ColorPalette {
-  if (typeof colorPalette === 'string' && colorPalettes.has(colorPalette as ColorPalette)) {
-    return colorPalette as ColorPalette;
+function normalizeReaderTheme(theme: unknown): ReaderTheme {
+  if (typeof theme === 'string') {
+    if (readerThemes.has(theme as ReaderTheme)) return theme as ReaderTheme;
+    if (Object.hasOwn(legacyReaderThemes, theme)) return legacyReaderThemes[theme];
   }
-  return defaultPreferences.colorPalette;
+  return defaultPreferences.theme;
 }
 
 function normalizeReaderFontFamily(fontFamily: unknown): ReaderFontFamily {

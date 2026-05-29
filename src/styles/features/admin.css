@@ -28,7 +28,7 @@
 .admin-login {
   display: grid;
   gap: var(--space-4);
-  max-width: var(--generated-length-420px);
+  max-width: var(--width-dialog);
   padding: var(--space-6);
 }
 
@@ -257,7 +257,7 @@
 .admin-stat-link {
   appearance: none;
   margin: var(--space-0);
-  border: var(--generated-length-1px) solid color-mix(in oklab, var(--app-accent) 28%, transparent);
+  border: var(--stroke-hairline) solid color-mix(in oklab, var(--app-accent) 28%, transparent);
   border-radius: var(--radius-pill);
   background: color-mix(in oklab, var(--app-accent) 8%, transparent);
   color: var(--app-ink);
@@ -403,7 +403,7 @@
 
 @media (min-width: 700px) {
   .admin-command-panel {
-    grid-template-columns: minmax(var(--space-0), 1fr) minmax(var(--generated-length-280px), auto) auto;
+    grid-template-columns: minmax(var(--space-0), 1fr) minmax(var(--space-image-offset), auto) auto;
     align-items: center;
   }
 
@@ -412,7 +412,7 @@
   }
 
   .admin-book-row {
-    grid-template-columns: minmax(var(--space-0), 1fr) minmax(var(--generated-length-280px), var(--generated-length-420px)) auto;
+    grid-template-columns: minmax(var(--space-0), 1fr) minmax(var(--space-image-offset), var(--width-dialog)) auto;
     align-items: center;
   }
 
@@ -426,6 +426,6 @@
   }
 
   .admin-access-actions {
-    min-width: var(--generated-length-188px);
+    min-width: var(--width-admin-min);
   }
 }

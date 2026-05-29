@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Concept F — Folio</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Inter:wght@400;500;600&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;1,7..72,400&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════
+   CONCEPT F: FOLIO
+   Editorial, type-led minimalism. Warm ivory paper,
+   confident display serif, hairline rules, no cards,
+   one claret accent used sparingly. Let the page breathe.
+   ═══════════════════════════════════════════ */
+
+:root {
+  /* ── Surfaces ── */
+  --bg-app:        #f6f3ec;
+  --bg-panel:      #fbf9f3;
+  --bg-reader:     #f8f5ee;
+  --bg-cover-wash: #efe9dd;
+
+  /* ── Ink ── */
+  --text-primary:   #1b1814;
+  --text-secondary: #6b6459;
+  --text-muted:     #9a9286;
+  --text-inverse:   #f8f5ee;
+  --reader-text:    #211d18;
+  --reader-muted:   #8a8174;
+
+  /* ── Accent (the spark) ── */
+  --accent:       #8a2b2e;
+  --accent-soft:  rgba(138,43,46,0.09);
+
+  /* ── Rules (hairlines do the work, not boxes) ── */
+  --rule:        rgba(27,24,20,0.14);
+  --rule-strong: rgba(27,24,20,0.26);
+
+  /* ── Spacing (4px base) ── */
+  --sp-1: 4px; --sp-2: 8px; --sp-3: 12px; --sp-4: 16px;
+  --sp-5: 20px; --sp-6: 24px; --sp-8: 32px; --sp-10: 40px;
+  --sp-12: 48px; --sp-16: 64px;
+
+  /* ── Radius (kept tiny — editorial is crisp) ── */
+  --r-sm: 3px; --r-md: 5px; --r-pill: 999px;
+
+  /* ── Type ── */
+  --font-display: 'Fraunces', Georgia, serif;
+  --font-reader:  'Literata', Georgia, serif;
+  --font-ui:      'Inter', -apple-system, sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; }
+
+body {
+  font-family: var(--font-ui);
+  background: var(--bg-app);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+  line-height: 1.5;
+}
+
+/* ── Concept header ── */
+.concept-header {
+  text-align: center;
+  padding: var(--sp-16) var(--sp-6) var(--sp-10);
+  border-bottom: 1px solid var(--rule);
+}
+.concept-header .eyebrow {
+  font-size: 0.7rem; letter-spacing: 0.22em; text-transform: uppercase;
+  color: var(--accent); font-weight: 600;
+}
+.concept-header h1 {
+  font-family: var(--font-display);
+  font-size: clamp(2.6rem, 6vw, 4rem);
+  font-weight: 500; font-optical-sizing: auto;
+  letter-spacing: -0.01em; margin-top: var(--sp-3);
+}
+.concept-header p {
+  color: var(--text-secondary); margin-top: var(--sp-3);
+  font-size: 0.95rem; max-width: 540px; margin-left: auto; margin-right: auto;
+}
+
+/* ── Sections ── */
+.section {
+  max-width: 920px; margin: var(--sp-16) auto; padding: 0 var(--sp-6);
+}
+.section > h2 {
+  font-family: var(--font-display);
+  font-size: 1.5rem; font-weight: 500; margin-bottom: var(--sp-6);
+}
+.section > .kicker {
+  font-size: 0.7rem; letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--text-muted); font-weight: 600; margin-bottom: var(--sp-2);
+}
+
+/* ── Palette ── */
+.palette-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: var(--sp-2);
+}
+.swatch {
+  aspect-ratio: 1; border-radius: var(--r-md);
+  display: flex; flex-direction: column; justify-content: flex-end;
+  padding: var(--sp-2); border: 1px solid var(--rule);
+}
+.swatch span { font-size: 0.6rem; font-weight: 600; letter-spacing: 0.04em; }
+.swatch .hex { opacity: 0.7; font-size: 0.56rem; font-weight: 400; }
+
+.type-spec { display: grid; gap: var(--sp-3); margin-top: var(--sp-6); }
+.type-spec .row { display: flex; align-items: baseline; gap: var(--sp-4); border-top: 1px solid var(--rule); padding-top: var(--sp-3); }
+.type-spec .lbl { font-size: 0.64rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-muted); width: 80px; flex-shrink: 0; }
+.type-spec .ex-display { font-family: var(--font-display); font-size: 1.7rem; font-weight: 500; }
+.type-spec .ex-reader { font-family: var(--font-reader); font-size: 1.1rem; }
+.type-spec .ex-ui { font-family: var(--font-ui); font-size: 0.95rem; }
+
+/* ── Device frame ── */
+.frames { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--sp-6); align-items: start; }
+.frame-label { font-size: 0.66rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--text-muted); font-weight: 600; margin-bottom: var(--sp-3); }
+.phone {
+  background: var(--bg-app);
+  border: 1px solid var(--rule-strong);
+  border-radius: 22px;
+  overflow: hidden;
+  box-shadow: 0 1px 0 rgba(255,255,255,0.6), 0 18px 40px rgba(27,24,20,0.07);
+  display: flex; flex-direction: column;
+  min-height: 600px;
+}
+.screen { flex: 1; display: flex; flex-direction: column; }
+
+/* ── Bottom nav (shared) ── */
+.nav-bar {
+  display: flex; justify-content: space-around;
+  padding: var(--sp-3) var(--sp-4) var(--sp-4);
+  border-top: 1px solid var(--rule);
+  background: var(--bg-panel);
+}
+.nav-item {
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  font-size: 0.7rem; color: var(--text-muted); font-weight: 500; cursor: pointer;
+  letter-spacing: 0.02em;
+}
+.nav-item .ic { font-size: 1.05rem; line-height: 1; }
+.nav-item.active { color: var(--accent); }
+
+/* ═══ HOME ═══ */
+.home { padding: var(--sp-6) var(--sp-5) var(--sp-4); flex: 1; }
+.home-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: var(--sp-8); }
+.home-greeting { font-family: var(--font-display); font-size: 1.9rem; font-weight: 500; letter-spacing: -0.01em; }
+.goal-mini { text-align: right; }
+.goal-mini .num { font-family: var(--font-display); font-size: 1.05rem; font-weight: 500; }
+.goal-mini .num b { color: var(--accent); font-weight: 600; }
+.goal-mini .lbl { font-size: 0.66rem; color: var(--text-muted); letter-spacing: 0.04em; }
+.goal-line { height: 2px; background: var(--rule); border-radius: 2px; margin-top: 5px; width: 96px; }
+.goal-line > i { display: block; height: 100%; width: 20%; background: var(--accent); border-radius: 2px; }
+
+.kicker-row { display: flex; justify-content: space-between; align-items: baseline; border-top: 1px solid var(--rule-strong); padding-top: var(--sp-3); margin-bottom: var(--sp-4); }
+.kicker-row .k { font-size: 0.68rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--text-secondary); font-weight: 600; }
+.kicker-row .more { font-size: 0.72rem; color: var(--text-muted); }
+
+/* Continue = hero */
+.hero { display: flex; gap: var(--sp-5); margin-bottom: var(--sp-10); cursor: pointer; }
+.hero-cover {
+  width: 104px; height: 156px; flex-shrink: 0; border-radius: var(--r-sm);
+  background: linear-gradient(155deg, #5b1416 0%, #1c0a0b 78%);
+  box-shadow: 0 10px 26px rgba(27,24,20,0.26);
+  display: flex; align-items: center; justify-content: center; text-align: center;
+  padding: 10px;
+  font-family: var(--font-display); font-style: italic; font-size: 0.66rem; color: #e9c9a8; line-height: 1.35;
+}
+.hero-body { display: flex; flex-direction: column; justify-content: center; }
+.hero-body .title { font-family: var(--font-display); font-size: 1.55rem; font-weight: 500; line-height: 1.1; letter-spacing: -0.01em; }
+.hero-body .author { font-size: 0.82rem; color: var(--text-secondary); margin-top: 4px; }
+.hero-body .meta { font-size: 0.74rem; color: var(--text-muted); margin-top: var(--sp-4); letter-spacing: 0.02em; }
+.hero-progress { height: 2px; background: var(--rule); border-radius: 2px; margin-top: var(--sp-2); }
+.hero-progress > i { display: block; height: 100%; width: 4%; background: var(--accent); }
+.hero-pct { font-size: 0.74rem; color: var(--accent); font-weight: 600; margin-top: 6px; }
+
+/* Top picks = quiet list */
+.picks { display: grid; gap: var(--sp-4); }
+.pick { display: flex; gap: var(--sp-4); align-items: center; cursor: pointer; }
+.pick + .pick { border-top: 1px solid var(--rule); padding-top: var(--sp-4); }
+.pick-cover { width: 44px; height: 62px; border-radius: var(--r-sm); flex-shrink: 0; box-shadow: 0 4px 10px rgba(27,24,20,0.18); }
+.pick-info { flex: 1; }
+.pick-info .pt { font-family: var(--font-display); font-size: 0.98rem; font-weight: 500; line-height: 1.15; }
+.pick-info .pg { font-size: 0.72rem; color: var(--text-muted); margin-top: 2px; }
+.pick-tag { font-size: 0.6rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-secondary); }
+
+/* ═══ LIBRARY ═══ */
+.lib { padding: var(--sp-6) var(--sp-5) var(--sp-4); flex: 1; }
+.lib-head { display: flex; align-items: baseline; gap: var(--sp-3); margin-bottom: var(--sp-5); }
+.lib-head h3 { font-family: var(--font-display); font-size: 1.9rem; font-weight: 500; letter-spacing: -0.01em; }
+.lib-head .count { font-size: 0.74rem; color: var(--text-muted); }
+.lib-filters { display: flex; gap: var(--sp-4); flex-wrap: wrap; border-bottom: 1px solid var(--rule); padding-bottom: var(--sp-3); margin-bottom: var(--sp-5); }
+.lib-filters .f { font-size: 0.76rem; color: var(--text-muted); cursor: pointer; padding-bottom: var(--sp-1); position: relative; }
+.lib-filters .f.active { color: var(--text-primary); font-weight: 600; }
+.lib-filters .f.active::after { content: ''; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; background: var(--accent); }
+
+.lib-list { display: grid; gap: 0; }
+.lib-row { display: flex; gap: var(--sp-4); align-items: center; padding: var(--sp-4) 0; border-top: 1px solid var(--rule); }
+.lib-row:first-child { border-top: none; }
+.lib-cover { width: 52px; height: 74px; border-radius: var(--r-sm); flex-shrink: 0; box-shadow: 0 5px 12px rgba(27,24,20,0.18); }
+.lib-meta { flex: 1; min-width: 0; }
+.lib-meta .lt { font-family: var(--font-display); font-size: 1.05rem; font-weight: 500; line-height: 1.15; }
+.lib-meta .ls { font-size: 0.74rem; color: var(--text-secondary); margin-top: 2px; }
+.lib-meta .tag { font-size: 0.58rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-muted); margin-top: var(--sp-2); }
+.lib-actions { display: flex; gap: var(--sp-3); color: var(--text-muted); }
+.lib-actions span { cursor: pointer; font-size: 1rem; }
+.lib-actions .on { color: var(--accent); }
+
+/* ═══ READER ═══ */
+.reader { display: flex; flex-direction: column; flex: 1; background: var(--bg-reader); }
+.reader-top {
+  display: grid; grid-template-columns: 32px 1fr 32px; align-items: center;
+  padding: var(--sp-4) var(--sp-5); border-bottom: 1px solid var(--rule);
+}
+.reader-top .ch { text-align: center; }
+.reader-top .ch .t { font-family: var(--font-display); font-size: 0.92rem; font-weight: 500; }
+.reader-top .ch .s { font-size: 0.66rem; color: var(--text-muted); margin-top: 1px; }
+.reader-top .ico { font-size: 1rem; color: var(--text-secondary); cursor: pointer; }
+.reader-body {
+  flex: 1; padding: var(--sp-8) var(--sp-6) var(--sp-6);
+  font-family: var(--font-reader); font-size: 1.04rem; line-height: 1.72;
+  color: var(--reader-text);
+}
+.reader-body p { margin-bottom: 1.15em; }
+.reader-body .lede::first-letter {
+  font-family: var(--font-display); font-size: 3.1rem; font-weight: 500; line-height: 0.8;
+  float: left; padding: 6px 10px 0 0; color: var(--accent);
+}
+.reader-body .beat { color: var(--reader-muted); }
+.reader-foot {
+  border-top: 1px solid var(--rule); padding: var(--sp-3) var(--sp-5) var(--sp-4);
+}
+.reader-foot .bar { height: 2px; background: var(--rule); border-radius: 2px; }
+.reader-foot .bar > i { display: block; height: 100%; width: 7%; background: var(--accent); }
+.reader-foot .row { display: flex; justify-content: space-between; align-items: center; margin-top: var(--sp-2); }
+.reader-foot .pg { font-size: 0.72rem; color: var(--text-muted); letter-spacing: 0.04em; }
+.reader-foot .ctl { display: flex; gap: var(--sp-5); color: var(--text-secondary); font-size: 0.95rem; }
+.reader-foot .ctl span { cursor: pointer; }
+
+/* ═══ SETTINGS ═══ */
+.settings { padding: var(--sp-5); flex: 1; }
+.sheet {
+  background: var(--bg-panel); border: 1px solid var(--rule);
+  border-radius: 14px; padding: var(--sp-6) var(--sp-5);
+}
+.sheet-title { font-family: var(--font-display); font-size: 1.3rem; font-weight: 500; display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--sp-5); }
+.sheet-title .x { font-size: 1rem; color: var(--text-muted); cursor: pointer; }
+.set-block { border-top: 1px solid var(--rule); padding-top: var(--sp-4); margin-top: var(--sp-4); }
+.set-block:first-of-type { border-top: none; padding-top: 0; margin-top: 0; }
+.set-lbl { font-size: 0.66rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--text-muted); font-weight: 600; margin-bottom: var(--sp-3); }
+.fontsize { display: flex; align-items: center; justify-content: space-between; }
+.fontsize button { background: none; border: 1px solid var(--rule); border-radius: var(--r-md); width: 40px; height: 40px; font-size: 1rem; color: var(--text-primary); cursor: pointer; font-family: var(--font-display); }
+.fontsize .aa { font-family: var(--font-display); font-size: 1.5rem; }
+.transition { display: flex; gap: var(--sp-5); }
+.transition .opt { font-size: 0.82rem; color: var(--text-muted); cursor: pointer; padding-bottom: 3px; }
+.transition .opt.on { color: var(--text-primary); font-weight: 600; border-bottom: 2px solid var(--accent); }
+.themes { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp-3); }
+.theme { border: 1px solid var(--rule); border-radius: var(--r-md); padding: var(--sp-3) var(--sp-2); text-align: center; cursor: pointer; }
+.theme .aa { font-family: var(--font-reader); font-size: 1.3rem; display: block; }
+.theme .nm { font-size: 0.64rem; color: var(--text-secondary); margin-top: var(--sp-1); letter-spacing: 0.04em; }
+.theme.on { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+.t-original { background: #f8f6ef; color: #191817; }
+.t-quiet    { background: #4f4f54; color: #efedf0; }
+.t-paper    { background: #fffdf6; color: #1a1b1d; }
+.t-bold     { background: #fbfaf7; color: #050505; }
+.t-calm     { background: #fff7e6; color: #2b2116; }
+.t-focus    { background: #f3f6f3; color: #111; }
+.slider { display: flex; align-items: center; gap: var(--sp-3); margin-top: var(--sp-3); }
+.slider .sl-lbl { font-size: 0.74rem; color: var(--text-secondary); width: 110px; }
+.slider input[type=range] { flex: 1; accent-color: var(--accent); height: 3px; }
+.toggle-row { display: flex; align-items: center; justify-content: space-between; margin-top: var(--sp-3); }
+.toggle-row .tg-lbl { font-size: 0.8rem; color: var(--text-primary); }
+.toggle { width: 42px; height: 24px; border-radius: 999px; background: var(--accent); position: relative; }
+.toggle::after { content: ''; position: absolute; top: 2px; left: 20px; width: 20px; height: 20px; border-radius: 50%; background: #fff; }
+.select { border: 1px solid var(--rule); border-radius: var(--r-md); padding: var(--sp-3); font-size: 0.82rem; color: var(--text-primary); display: flex; justify-content: space-between; }
+
+/* ── Rationale ── */
+.rationale p { color: var(--text-secondary); font-size: 0.95rem; line-height: 1.75; max-width: 660px; }
+.rationale strong { color: var(--text-primary); }
+.rationale .fixes { list-style: none; margin-top: var(--sp-5); display: grid; gap: var(--sp-3); }
+.rationale .fixes li { padding-left: var(--sp-5); position: relative; font-size: 0.9rem; color: var(--text-secondary); line-height: 1.5; }
+.rationale .fixes li::before { content: '—'; position: absolute; left: 0; color: var(--accent); }
+
+@media (max-width: 760px) { .frames { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<div class="concept-header">
+  <div class="eyebrow">Minimalist Direction 1 of 3</div>
+  <h1>Folio</h1>
+  <p>Editorial, type-led minimalism. The page is set like a literary journal — confident display serif, hairline rules instead of boxes, one claret accent, and air.</p>
+</div>
+
+<!-- PALETTE + TYPE -->
+<section class="section">
+  <div class="kicker">Palette — warm ivory, one spark of claret</div>
+  <h2>System</h2>
+  <div class="palette-grid">
+    <div class="swatch" style="background:#f6f3ec"><span>App</span><span class="hex">#f6f3ec</span></div>
+    <div class="swatch" style="background:#fbf9f3"><span>Panel</span><span class="hex">#fbf9f3</span></div>
+    <div class="swatch" style="background:#f8f5ee"><span>Reader</span><span class="hex">#f8f5ee</span></div>
+    <div class="swatch" style="background:#1b1814"><span style="color:#f8f5ee">Ink</span><span class="hex" style="color:#9a9286">#1b1814</span></div>
+    <div class="swatch" style="background:#6b6459"><span style="color:#f8f5ee">Secondary</span><span class="hex" style="color:#e6e1d6">#6b6459</span></div>
+    <div class="swatch" style="background:#8a2b2e"><span style="color:#f8f5ee">Claret</span><span class="hex" style="color:#e9c9c9">#8a2b2e</span></div>
+  </div>
+  <div class="type-spec">
+    <div class="row"><span class="lbl">Display</span><span class="ex-display">The Friction of the Spark</span></div>
+    <div class="row"><span class="lbl">Reader</span><span class="ex-reader">The house kept the morning at nineteen degrees.</span></div>
+    <div class="row"><span class="lbl">Interface</span><span class="ex-ui">Continue · Library · Search</span></div>
+  </div>
+</section>
+
+<!-- SCREENS: HOME + LIBRARY -->
+<section class="section">
+  <div class="kicker">The two browse screens</div>
+  <h2>Home &amp; Library</h2>
+  <div class="frames">
+    <!-- HOME -->
+    <div>
+      <div class="frame-label">Home</div>
+      <div class="phone"><div class="screen">
+        <div class="home">
+          <div class="home-top">
+            <div class="home-greeting">Home</div>
+            <div class="goal-mini">
+              <div class="num"><b>3</b> / 15 min</div>
+              <div class="lbl">today · 0 finished this year</div>
+              <div class="goal-line"><i></i></div>
+            </div>
+          </div>
+
+          <div class="kicker-row"><span class="k">Continue</span></div>
+          <div class="hero">
+            <div class="hero-cover">The Friction<br>of the Spark</div>
+            <div class="hero-body">
+              <div class="title">The Friction of&nbsp;the Spark</div>
+              <div class="author">Shiminize</div>
+              <div class="meta">Chapter 1 · The Vacuum</div>
+              <div class="hero-progress"><i></i></div>
+              <div class="hero-pct">4%</div>
+            </div>
+          </div>
+
+          <div class="kicker-row"><span class="k">Top Picks</span><span class="more">View all →</span></div>
+          <div class="picks">
+            <div class="pick">
+              <div class="pick-cover" style="background:linear-gradient(155deg,#5b1416,#1c0a0b)"></div>
+              <div class="pick-info"><div class="pt">Ready to continue</div><div class="pg">Dark romantic suspense tragedy</div></div>
+              <span class="pick-tag">Resume</span>
+            </div>
+            <div class="pick">
+              <div class="pick-cover" style="background:linear-gradient(155deg,#1f3a2c,#0e1a14)"></div>
+              <div class="pick-info"><div class="pt">Marked Want to Read</div><div class="pg">Structural Audit Notes · PDF reference</div></div>
+              <span class="pick-tag">Saved</span>
+            </div>
+            <div class="pick">
+              <div class="pick-cover" style="background:linear-gradient(155deg,#6b1a1a,#2a0a0a)"></div>
+              <div class="pick-info"><div class="pt">Fits your current shelf</div><div class="pg">Reader Sample · collection entry</div></div>
+              <span class="pick-tag">Sample</span>
+            </div>
+          </div>
+        </div>
+        <div class="nav-bar">
+          <div class="nav-item active"><span class="ic">⌂</span>Home</div>
+          <div class="nav-item"><span class="ic">▤</span>Library</div>
+          <div class="nav-item"><span class="ic">⌕</span>Search</div>
+        </div>
+      </div></div>
+    </div>
+
+    <!-- LIBRARY -->
+    <div>
+      <div class="frame-label">Library</div>
+      <div class="phone"><div class="screen">
+        <div class="lib">
+          <div class="lib-head"><h3>Library</h3><span class="count">3 items</span></div>
+          <div class="lib-filters">
+            <span class="f active">All</span>
+            <span class="f">Continue</span>
+            <span class="f">Want to Read</span>
+            <span class="f">Finished</span>
+            <span class="f">Samples</span>
+            <span class="f">PDFs</span>
+          </div>
+          <div class="lib-list">
+            <div class="lib-row">
+              <div class="lib-cover" style="background:linear-gradient(155deg,#5b1416,#1c0a0b)"></div>
+              <div class="lib-meta">
+                <div class="lt">The Friction of the Spark</div>
+                <div class="ls">Shiminize · Dark romantic suspense</div>
+                <div class="tag">Book · 4% read</div>
+              </div>
+              <div class="lib-actions"><span class="on">★</span><span>✓</span></div>
+            </div>
+            <div class="lib-row">
+              <div class="lib-cover" style="background:linear-gradient(155deg,#1f3a2c,#0e1a14)"></div>
+              <div class="lib-meta">
+                <div class="lt">Structural Audit Notes</div>
+                <div class="ls">Project reference</div>
+                <div class="tag">PDF · Want to read</div>
+              </div>
+              <div class="lib-actions"><span>☆</span><span class="on">✓</span></div>
+            </div>
+            <div class="lib-row">
+              <div class="lib-cover" style="background:linear-gradient(155deg,#6b1a1a,#2a0a0a)"></div>
+              <div class="lib-meta">
+                <div class="lt">Reader Sample</div>
+                <div class="ls">Sample collection entry</div>
+                <div class="tag">Sample</div>
+              </div>
+              <div class="lib-actions"><span>☆</span><span>✓</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="nav-bar">
+          <div class="nav-item"><span class="ic">⌂</span>Home</div>
+          <div class="nav-item active"><span class="ic">▤</span>Library</div>
+          <div class="nav-item"><span class="ic">⌕</span>Search</div>
+        </div>
+      </div></div>
+    </div>
+  </div>
+</section>
+
+<!-- SCREENS: READER + SETTINGS -->
+<section class="section">
+  <div class="kicker">The reading surface &amp; its controls</div>
+  <h2>Reader &amp; Settings</h2>
+  <div class="frames">
+    <!-- READER -->
+    <div>
+      <div class="frame-label">Reader — chrome reduced to two hairline bars</div>
+      <div class="phone"><div class="screen reader">
+        <div class="reader-top">
+          <span class="ico">‹</span>
+          <div class="ch"><div class="t">The Vacuum</div><div class="s">Chapter 1</div></div>
+          <span class="ico">✕</span>
+        </div>
+        <div class="reader-body">
+          <p class="lede">The house kept the morning at nineteen degrees.</p>
+          <p class="beat">Not cool. Not warm. Correct.</p>
+          <p>Eline crossed the foyer by the marble seams, heel to edge, edge to heel, never cutting through the white center of a tile. The stone had been polished until it held the light without reflecting it. There were no soft places here.</p>
+          <p class="beat">Her shoes should have clicked.</p>
+          <p class="beat">They did not.</p>
+        </div>
+        <div class="reader-foot">
+          <div class="bar"><i></i></div>
+          <div class="row">
+            <span class="pg">Page 1 of 14</span>
+            <div class="ctl"><span>Aa</span><span>☰</span></div>
+          </div>
+        </div>
+      </div></div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div>
+      <div class="frame-label">Themes &amp; Settings</div>
+      <div class="phone"><div class="screen">
+        <div class="settings">
+          <div class="sheet">
+            <div class="sheet-title">Themes &amp; Settings <span class="x">✕</span></div>
+
+            <div class="set-block">
+              <div class="set-lbl">Text size</div>
+              <div class="fontsize">
+                <button>−</button>
+                <span class="aa">Aa</span>
+                <button>+</button>
+              </div>
+            </div>
+
+            <div class="set-block">
+              <div class="set-lbl">Page turn</div>
+              <div class="transition">
+                <span class="opt">Curl</span>
+                <span class="opt on">Fast Fade</span>
+                <span class="opt">Scroll</span>
+              </div>
+            </div>
+
+            <div class="set-block">
+              <div class="set-lbl">Reader theme</div>
+              <div class="themes">
+                <div class="theme t-original on"><span class="aa">Aa</span><span class="nm">Original</span></div>
+                <div class="theme t-quiet"><span class="aa">Aa</span><span class="nm">Quiet</span></div>
+                <div class="theme t-paper"><span class="aa">Aa</span><span class="nm">Paper</span></div>
+                <div class="theme t-bold"><span class="aa">Aa</span><span class="nm">Bold</span></div>
+                <div class="theme t-calm"><span class="aa">Aa</span><span class="nm">Calm</span></div>
+                <div class="theme t-focus"><span class="aa">Aa</span><span class="nm">Focus</span></div>
+              </div>
+            </div>
+
+            <div class="set-block">
+              <div class="set-lbl">Customize</div>
+              <div class="select">Font — Original <span style="color:var(--text-muted)">▾</span></div>
+              <div class="toggle-row"><span class="tg-lbl">Bold text</span><span class="toggle"></span></div>
+              <div class="slider"><span class="sl-lbl">Line spacing</span><input type="range" min="0" max="100" value="55"></div>
+              <div class="slider"><span class="sl-lbl">Character spacing</span><input type="range" min="0" max="100" value="30"></div>
+              <div class="slider"><span class="sl-lbl">Brightness</span><input type="range" min="0" max="100" value="72"></div>
+            </div>
+          </div>
+        </div>
+      </div></div>
+    </div>
+  </div>
+</section>
+
+<!-- RATIONALE -->
+<section class="section rationale" style="padding-bottom:96px">
+  <div class="kicker">Why this direction</div>
+  <h2>Folio</h2>
+  <p><strong>Folio treats the app like a beautifully typeset book.</strong> It keeps the warm-paper soul the product already has, but removes every box, shadow, and saturated panel that competed with it. Hierarchy is built from type scale and hairline rules, not coloured cards. The one claret accent — drawn from <em>The Friction of the Spark</em> itself — appears only on progress, active states, and the drop-cap, so it always means "here, now."</p>
+  <ul class="fixes">
+    <li><strong>Continue is the hero.</strong> The book you're 4% into anchors Home at full size; Top Picks drop to a quiet list beneath it.</li>
+    <li><strong>One card system — none.</strong> Library and Top Picks become hairline-separated rows, so cover art is the only colour on the page.</li>
+    <li><strong>Reader chrome collapses to two hairline bars.</strong> One progress line, one page label, two controls (Aa, contents). The text is the interface.</li>
+    <li><strong>UI type grows up.</strong> Labels sit at 12–13px with editorial small-caps, replacing the sub-10px navigation text.</li>
+    <li><strong>Desktop becomes a centred ~720px column</strong> with the same rules — no more stretched-mobile dead space.</li>
+  </ul>
+</section>
+
+</body>
+</html>

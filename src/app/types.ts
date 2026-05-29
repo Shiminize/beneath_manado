@@ -4,11 +4,9 @@ export type LibraryItemType = 'book' | 'pdf' | 'sample';
 
 export type ReadingStatus = 'reading' | 'want-to-read' | 'finished' | 'new';
 
-export type ReaderTheme = 'original' | 'quiet' | 'paper' | 'bold' | 'calm' | 'focus';
+export type ReaderTheme = 'light' | 'dark' | 'contrast';
 
-export type ColorPalette = 'sage' | 'oxide' | 'noir' | 'rose' | 'dusk' | 'marine' | 'parchment';
-
-export type PageTurnMode = 'curl' | 'fade' | 'scroll';
+export type PageTurnMode = 'fade' | 'scroll';
 
 export type OrientationLock = 'off' | 'portrait' | 'landscape';
 
@@ -56,7 +54,6 @@ export interface ReadingProgress {
 
 export interface ReaderPreferences {
   theme: ReaderTheme;
-  colorPalette: ColorPalette;
   fontSize: number;
   fontFamily: ReaderFontFamily;
   boldText: boolean;

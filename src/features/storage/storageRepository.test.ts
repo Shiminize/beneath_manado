@@ -57,43 +57,65 @@ describe('storage repository', () => {
     expect(loaded.preferences.fontFamily).toBe('palatino');
   });
 
-  it('defaults legacy state without a color palette to parchment', () => {
+  it('migrates the legacy quiet theme to dark', () => {
     const storage = new MemoryStorage();
     const state = createInitialState(items);
-    delete (state.preferences as Partial<typeof state.preferences>).colorPalette;
+    (state.preferences as { theme: string }).theme = 'quiet';
 
     saveAppState(state, storage);
     const loaded = loadAppState(items, storage);
 
-    expect(loaded.preferences.colorPalette).toBe('parchment');
+    expect(loaded.preferences.theme).toBe('dark');
   });
 
-  it('normalizes an invalid color palette to parchment', () => {
+  it('maps legacy light-family themes to light', () => {
     const storage = new MemoryStorage();
     const state = createInitialState(items);
-    (state.preferences as { colorPalette?: string }).colorPalette = 'plum';
+    (state.preferences as { theme: string }).theme = 'paper';
 
     saveAppState(state, storage);
     const loaded = loadAppState(items, storage);
 
-    expect(loaded.preferences.colorPalette).toBe('parchment');
+    expect(loaded.preferences.theme).toBe('light');
   });
 
-  it('persists a valid color palette', () => {
+  it('normalizes an invalid reader theme to light', () => {
     const storage = new MemoryStorage();
     const state = createInitialState(items);
-    state.preferences.colorPalette = 'marine';
+    (state.preferences as { theme?: string }).theme = 'plum';
 
     saveAppState(state, storage);
     const loaded = loadAppState(items, storage);
 
-    expect(loaded.preferences.colorPalette).toBe('marine');
+    expect(loaded.preferences.theme).toBe('light');
+  });
+
+  it('does not treat inherited Object keys as legacy themes', () => {
+    const storage = new MemoryStorage();
+    const state = createInitialState(items);
+    (state.preferences as { theme?: string }).theme = 'toString';
+
+    saveAppState(state, storage);
+    const loaded = loadAppState(items, storage);
+
+    expect(loaded.preferences.theme).toBe('light');
+  });
+
+  it('persists a valid reader theme', () => {
+    const storage = new MemoryStorage();
+    const state = createInitialState(items);
+    state.preferences.theme = 'contrast';
+
+    saveAppState(state, storage);
+    const loaded = loadAppState(items, storage);
+
+    expect(loaded.preferences.theme).toBe('contrast');
   });
 
   it('normalizes legacy curl page turns to fast fade', () => {
     const storage = new MemoryStorage();
     const state = createInitialState(items);
-    state.preferences.pageTurnMode = 'curl';
+    (state.preferences as { pageTurnMode: string }).pageTurnMode = 'curl';
 
     saveAppState(state, storage);
     const loaded = loadAppState(items, storage);

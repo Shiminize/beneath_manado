@@ -264,7 +264,7 @@ export function App() {
   }
 
   return (
-    <div className="app-shell" data-color-palette={appState.preferences.colorPalette} data-reader-theme={appState.preferences.theme}>
+    <div className="app-shell" data-reader-theme={appState.preferences.theme}>
       {route.view === 'home' && (
         <HomeScreen
           items={items}

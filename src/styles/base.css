@@ -30,6 +30,6 @@ input:focus-visible,
 select:focus-visible,
 summary:focus-visible,
 [role='slider']:focus-visible {
-  outline: var(--generated-length-3px) solid var(--focus-color, var(--color-accent-green-700));
-  outline-offset: var(--generated-length-3px);
+  outline: var(--stroke-focus) solid var(--focus-color, var(--accent));
+  outline-offset: var(--stroke-focus);
 }

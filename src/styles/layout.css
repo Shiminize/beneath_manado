@@ -1,14 +1,14 @@
 .app-shell {
-  min-height: var(--generated-length-100dvh);
+  min-height: var(--size-dvh);
   color: var(--app-ink);
   background:
-    linear-gradient(180deg, var(--surface-app-wash), transparent var(--generated-length-280px)),
+    linear-gradient(180deg, var(--surface-app-wash), transparent var(--space-image-offset)),
     var(--app-bg);
   padding-bottom: calc(var(--navigation-shell-clearance) + var(--safe-bottom));
 }
 
 .screen {
-  width: min(100%, var(--generated-length-1120px));
+  width: min(var(--size-full), var(--width-screen-max));
   margin: 0 auto;
   padding: var(--space-8) var(--space-6) 0;
 }
@@ -23,10 +23,11 @@
 
 .screen-header h1 {
   margin: 0;
-  font-family: var(--font-serif);
+  font-family: var(--font-display);
   font-size: var(--text-heading-lg);
+  font-weight: 500;
   line-height: 1.05;
-  letter-spacing: 0;
+  letter-spacing: var(--tracking-tight);
 }
 
 .screen-header p,

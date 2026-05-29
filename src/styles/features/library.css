@@ -1,24 +1,30 @@
+/* Filters — underline-active text, no pills. */
 .collection-rail {
   display: flex;
-  gap: var(--space-2-5);
+  gap: var(--space-5);
   overflow-x: auto;
   padding-bottom: var(--space-3);
-  margin-bottom: var(--space-3-5);
+  margin-bottom: var(--space-5);
+  border-bottom: var(--stroke-hairline) solid var(--border-subtle);
 }
 
 .collection-pill {
   white-space: nowrap;
   min-height: var(--space-10);
-  padding: 0 var(--space-3-5);
-  border-radius: var(--radius-pill);
-  color: var(--app-muted);
-  background: var(--generated-color-rgba-255-255-255-0neg-64);
-  font-size: var(--text-control);
+  padding: 0 var(--space-0-5);
+  color: var(--text-muted);
+  background: transparent;
+  font-size: var(--text-ui-md);
+  position: relative;
 }
 
 .collection-pill.active {
-  background: var(--app-ink);
-  color: var(--app-surface);
+  color: var(--text-primary);
+  font-weight: 600;
+  background-image: linear-gradient(var(--action-primary), var(--action-primary));
+  background-repeat: no-repeat;
+  background-position: left bottom;
+  background-size: var(--size-full) var(--stroke-strong);
 }
 
 .collection-form,
@@ -36,38 +42,43 @@
 .collection-form input,
 .search-field input,
 .customize-grid select {
-  width: 100%;
+  width: var(--size-full);
   min-height: var(--space-10);
   border: 0;
   background: transparent;
-  color: var(--app-ink);
+  color: var(--text-primary);
   outline: none;
 }
 
 .library-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(var(--generated-length-218px), 1fr));
-  gap: var(--space-3);
+  grid-template-columns: repeat(auto-fill, minmax(var(--width-library-card-min), 1fr));
+  gap: var(--space-4);
 }
 
 .library-list {
   display: grid;
-  gap: var(--space-3);
+  gap: var(--space-0);
 }
 
-.library-card {
+/* List view = hairline rows. */
+.library-list .library-card {
   display: grid;
   grid-template-columns: var(--space-23) 1fr;
-  gap: var(--space-3);
-  padding: var(--space-4);
-  border-radius: var(--radius-ui);
-  background: var(--surface-panel-soft);
-  box-shadow: var(--shadow-raised);
+  gap: var(--space-4);
+  padding: var(--space-4) var(--space-0-5);
+  border-top: var(--stroke-hairline) solid var(--border-subtle);
 }
 
+.library-list .library-card:first-child {
+  border-top: 0;
+}
+
+/* Grid view = flat cover-led cards. */
 .library-grid .library-card {
+  display: grid;
   grid-template-columns: 1fr;
-  gap: var(--space-2-5);
+  gap: var(--space-3);
 }
 
 .library-card-body {
@@ -79,13 +90,13 @@
 }
 
 .library-cover-button {
-  width: 100%;
+  width: var(--size-full);
   padding: 0;
 }
 
 .library-title-button {
   padding: 0;
-  width: 100%;
+  width: var(--size-full);
 }
 
 .library-title-button strong,
@@ -94,13 +105,15 @@
 }
 
 .library-title-button strong {
+  font-family: var(--font-display);
+  font-weight: 500;
   overflow-wrap: anywhere;
-  line-height: 1.2;
+  line-height: var(--line-card);
 }
 
 .library-title-button span {
   margin-top: var(--space-1);
-  color: var(--app-muted);
+  color: var(--text-muted);
   overflow-wrap: anywhere;
 }
 
@@ -119,6 +132,7 @@
   overflow: hidden;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
+  color: var(--text-muted);
 }
 
 .library-meta,
@@ -136,42 +150,34 @@
   margin-top: var(--space-2);
 }
 
+/* Quiet hairline tags — no colour fill. */
 .library-meta span {
-  min-height: var(--space-7);
+  min-height: var(--space-6);
   display: inline-flex;
   align-items: center;
-  border-radius: var(--radius-ui);
-  padding: 0 var(--space-2-5);
-  background: var(--generated-color-rgba-15-128-103-0neg-1);
-  color: var(--app-accent);
-  font-size: var(--generated-length-0neg-76rem);
-  font-weight: 700;
-}
-
-.library-grid .library-meta span {
-  min-height: var(--space-6);
+  border: var(--stroke-hairline) solid var(--border-subtle);
+  border-radius: var(--radius-sm);
   padding: 0 var(--space-2);
+  color: var(--text-muted);
   font-size: var(--text-ui-xs);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  font-weight: 600;
 }
 
 .collection-select {
   min-height: var(--space-10);
-  border: 0;
+  border: var(--stroke-hairline) solid var(--border-subtle);
   border-radius: var(--radius-ui);
   padding: 0 var(--space-2-5);
   background: var(--surface-field);
+  color: var(--text-primary);
 }
 
 @media (max-width: 700px) {
   .library-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: var(--space-2);
-  }
-
-  .library-grid .library-card {
-    grid-template-columns: var(--space-18-5) minmax(0, 1fr);
-    gap: var(--space-2);
-    padding: var(--space-2);
+    gap: var(--space-3);
   }
 
   .library-grid .library-title-button strong {
