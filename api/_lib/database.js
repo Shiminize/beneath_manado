@@ -5,7 +5,6 @@ import { decryptDisplayPassword } from './security.js';
 
 let sqlClient;
 let schemaPromise;
-let lastRetentionCleanup = 0;
 const readingSessionMigrationId = 'aggregate-page-events-to-reading-sessions-v1';
 const readingSessionInactivityMinutes = 30;
 const rawReaderEventTypes = new Set(['book_open', 'page_view', 'progress']);
@@ -187,8 +186,6 @@ export async function recordAnalyticsEvent(event, identity) {
       )
     `;
   }
-
-  await cleanupRetention();
 
   return { stored: true };
 }
@@ -772,14 +769,19 @@ function nullableNumber(value) {
   return typeof value === 'number' && Number.isFinite(value) ? value : null;
 }
 
-async function cleanupRetention() {
-  const now = Date.now();
-  if (now - lastRetentionCleanup < 60 * 60 * 1000) return;
-  lastRetentionCleanup = now;
+export function resolveRetentionDays(rawValue = process.env.ANALYTICS_RETENTION_DAYS) {
+  const parsedRetentionDays = Number(rawValue || 90);
+  return Number.isFinite(parsedRetentionDays) ? Math.max(1, parsedRetentionDays) : 90;
+}
 
-  const parsedRetentionDays = Number(process.env.ANALYTICS_RETENTION_DAYS || 90);
-  const retentionDays = Number.isFinite(parsedRetentionDays) ? Math.max(1, parsedRetentionDays) : 90;
+export async function enforceRetention() {
+  if (!hasDatabase()) return { ok: false, error: 'database_not_configured' };
+  await ensureSchema();
+
+  const retentionDays = resolveRetentionDays();
   await sql()`delete from reader_events where created_at < now() - make_interval(days => ${retentionDays})`;
   await sql()`delete from reader_reading_sessions where created_at < now() - make_interval(days => ${retentionDays})`;
   await sql()`delete from reader_unlock_audit where created_at < now() - make_interval(days => ${retentionDays})`;
+
+  return { ok: true, retentionDays };
 }
