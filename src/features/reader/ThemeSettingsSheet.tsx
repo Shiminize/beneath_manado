@@ -1,5 +1,5 @@
-import { AlignJustify, Bold, ChevronDown, FileText, Minus, Palette, Plus, Sun, Type } from 'lucide-react';
-import type { ColorPalette, ReaderPreferences, ReaderTheme } from '../../app/types';
+import { AlignJustify, Bold, ChevronDown, FileText, Minus, Plus, Sun, Type } from 'lucide-react';
+import type { ReaderPreferences, ReaderTheme } from '../../app/types';
 import { Sheet } from '../../ui';
 
 interface ThemeSettingsSheetProps {
@@ -9,22 +9,9 @@ interface ThemeSettingsSheetProps {
 }
 
 const themes: { value: ReaderTheme; label: string }[] = [
-  { value: 'original', label: 'Original' },
-  { value: 'quiet', label: 'Quiet' },
-  { value: 'paper', label: 'Paper' },
-  { value: 'bold', label: 'Bold' },
-  { value: 'calm', label: 'Calm' },
-  { value: 'focus', label: 'Focus' }
-];
-
-const colorPalettes: { value: ColorPalette; label: string; description: string }[] = [
-  { value: 'parchment', label: 'Warm Parchment', description: 'Cozy amber warmth' },
-  { value: 'sage', label: 'Digital Sage', description: 'Soft library green' },
-  { value: 'oxide', label: 'Sepia Oxide', description: 'Warm literary sepia' },
-  { value: 'noir', label: 'Ink Pearl', description: 'Clean product neutral' },
-  { value: 'rose', label: 'Rosewood', description: 'Manuscript warmth' },
-  { value: 'dusk', label: 'Olive Dusk', description: 'Low-light reading' },
-  { value: 'marine', label: 'Marine Mist', description: 'Cool study tone' }
+  { value: 'light', label: 'Light' },
+  { value: 'dark', label: 'Dark' },
+  { value: 'contrast', label: 'High Contrast' }
 ];
 
 const fontOptions: { value: ReaderPreferences['fontFamily']; label: string }[] = [
@@ -51,32 +38,6 @@ export function ThemeSettingsSheet({ preferences, onChange, onClose }: ThemeSett
 
   return (
     <Sheet title="Themes & Settings" titleId="theme-settings-title" className="settings-sheet" closeLabel="Close themes and settings" onClose={onClose}>
-        <section className="settings-section" aria-labelledby="color-palette-heading">
-          <div className="settings-section-label" id="color-palette-heading">
-            <Palette size={SETTINGS_ICON_SIZE} aria-hidden="true" />
-            <span>Color Palette</span>
-          </div>
-          <div className="palette-grid">
-            {colorPalettes.map((palette) => (
-              <button
-                key={palette.value}
-                type="button"
-                aria-pressed={preferences.colorPalette === palette.value}
-                className={preferences.colorPalette === palette.value ? `palette-card ${palette.value} active` : `palette-card ${palette.value}`}
-                onClick={() => onChange({ colorPalette: palette.value })}
-              >
-                <span className="palette-swatch-row" aria-hidden="true">
-                  <span className="palette-swatch app" />
-                  <span className="palette-swatch action" />
-                  <span className="palette-swatch reader" />
-                </span>
-                <strong>{palette.label}</strong>
-                <small>{palette.description}</small>
-              </button>
-            ))}
-          </div>
-        </section>
-
         <div className="font-size-control">
           <div className="segmented-control font-size-stepper" aria-label="Font size">
             <button type="button" aria-label="Decrease font size" onClick={() => onChange({ fontSize: Math.max(FONT_SIZE_MIN, preferences.fontSize - 1) })}>
@@ -114,7 +75,7 @@ export function ThemeSettingsSheet({ preferences, onChange, onClose }: ThemeSett
             <button
               key={value}
               type="button"
-              className={preferences.pageTurnMode === value || (preferences.pageTurnMode === 'curl' && value === 'fade') ? 'page-turn-button active' : 'page-turn-button'}
+              className={preferences.pageTurnMode === value ? 'page-turn-button active' : 'page-turn-button'}
               onClick={() => onChange({ pageTurnMode: value })}
             >
               <FileText size={SETTINGS_ICON_SIZE} aria-hidden="true" />

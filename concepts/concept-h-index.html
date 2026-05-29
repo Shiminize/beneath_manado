@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Concept H — Index</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════
+   CONCEPT H: INDEX
+   Structured, functional minimalism. Cool near-white,
+   a strict hairline grid, grotesk UI + monospace
+   metadata, zero shadow. The precision of a good tool.
+   ═══════════════════════════════════════════ */
+
+:root {
+  /* ── Surfaces ── */
+  --bg-app:    #fafafa;
+  --bg-panel:  #ffffff;
+  --bg-soft:   #f4f4f5;
+  --bg-reader: #fcfcfc;
+  --bg-ink:    #18181b;
+
+  /* ── Text ── */
+  --text-primary:   #18181b;
+  --text-secondary: #52525b;
+  --text-muted:     #a1a1aa;
+  --text-inverse:   #fafafa;
+  --reader-text:    #1f1f23;
+  --reader-muted:   #71717a;
+
+  /* ── Lines (the whole system is lines) ── */
+  --line:        #e4e4e7;
+  --line-strong: #d4d4d8;
+
+  /* ── Spacing (4px base) ── */
+  --sp-1: 4px; --sp-2: 8px; --sp-3: 12px; --sp-4: 16px;
+  --sp-5: 20px; --sp-6: 24px; --sp-8: 32px; --sp-10: 40px;
+  --sp-12: 48px; --sp-16: 64px;
+
+  /* ── Radius (square, functional) ── */
+  --r-sm: 4px; --r-md: 6px;
+
+  /* ── Type ── */
+  --font-ui:     'Inter', -apple-system, sans-serif;
+  --font-mono:   'IBM Plex Mono', ui-monospace, monospace;
+  --font-reader: 'Source Serif 4', Georgia, serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; }
+
+body {
+  font-family: var(--font-ui);
+  background: var(--bg-app);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+  line-height: 1.5;
+}
+
+/* ── Concept header ── */
+.concept-header { text-align: center; padding: var(--sp-16) var(--sp-6) var(--sp-10); border-bottom: 1px solid var(--line); }
+.concept-header .eyebrow { font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-muted); }
+.concept-header h1 { font-size: clamp(2.4rem, 6vw, 3.6rem); font-weight: 700; letter-spacing: -0.03em; margin-top: var(--sp-3); }
+.concept-header p { color: var(--text-secondary); margin-top: var(--sp-3); font-size: 0.95rem; max-width: 540px; margin-inline: auto; }
+
+/* ── Sections ── */
+.section { max-width: 920px; margin: var(--sp-16) auto; padding: 0 var(--sp-6); }
+.section > .kicker { font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-muted); margin-bottom: var(--sp-2); }
+.section > .kicker .idx { color: var(--text-primary); }
+.section > h2 { font-size: 1.5rem; font-weight: 700; letter-spacing: -0.02em; margin-bottom: var(--sp-6); }
+
+/* ── Palette ── */
+.palette-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 0; border: 1px solid var(--line); border-radius: var(--r-md); overflow: hidden; }
+.swatch { aspect-ratio: 1; display: flex; flex-direction: column; justify-content: flex-end; padding: var(--sp-2); border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.swatch span { font-family: var(--font-mono); font-size: 0.6rem; }
+.swatch .hex { opacity: 0.7; font-size: 0.56rem; }
+.type-spec { display: grid; gap: 0; margin-top: var(--sp-6); border: 1px solid var(--line); border-radius: var(--r-md); }
+.type-spec .row { display: flex; align-items: baseline; gap: var(--sp-4); padding: var(--sp-4); border-bottom: 1px solid var(--line); }
+.type-spec .row:last-child { border-bottom: none; }
+.type-spec .lbl { font-family: var(--font-mono); font-size: 0.62rem; text-transform: uppercase; color: var(--text-muted); width: 90px; flex-shrink: 0; }
+.type-spec .ex-h { font-size: 1.5rem; font-weight: 700; letter-spacing: -0.02em; }
+.type-spec .ex-r { font-family: var(--font-reader); font-size: 1.1rem; }
+.type-spec .ex-m { font-family: var(--font-mono); font-size: 0.92rem; }
+
+/* ── Device frame ── */
+.frames { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--sp-6); align-items: start; }
+.frame-label { font-family: var(--font-mono); font-size: 0.66rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: var(--sp-3); }
+.phone { background: var(--bg-panel); border: 1px solid var(--line-strong); border-radius: 14px; overflow: hidden; display: flex; flex-direction: column; min-height: 600px; }
+.screen { flex: 1; display: flex; flex-direction: column; }
+
+/* ── Bottom nav ── */
+.nav-bar { display: flex; border-top: 1px solid var(--line); }
+.nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: var(--sp-3) 0 var(--sp-4); font-size: 0.72rem; color: var(--text-muted); font-weight: 500; cursor: pointer; border-right: 1px solid var(--line); }
+.nav-item:last-child { border-right: none; }
+.nav-item .ic { font-size: 1.05rem; line-height: 1; }
+.nav-item.active { color: var(--text-primary); background: var(--bg-soft); }
+
+/* ── Screen header row (shared) ── */
+.scr-head { display: flex; align-items: baseline; justify-content: space-between; padding: var(--sp-5) var(--sp-5) var(--sp-4); border-bottom: 1px solid var(--line); }
+.scr-head h3 { font-size: 1.4rem; font-weight: 700; letter-spacing: -0.02em; }
+.scr-head .count { font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-muted); }
+
+/* ═══ HOME ═══ */
+.home { flex: 1; }
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); border-bottom: 1px solid var(--line); }
+.stat { padding: var(--sp-4) var(--sp-5); border-right: 1px solid var(--line); }
+.stat:last-child { border-right: none; }
+.stat .v { font-family: var(--font-mono); font-size: 1.25rem; font-weight: 600; }
+.stat .v small { color: var(--text-muted); font-size: 0.8rem; }
+.stat .k { font-size: 0.66rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em; margin-top: 2px; }
+
+.block-label { display: flex; align-items: center; justify-content: space-between; padding: var(--sp-4) var(--sp-5) var(--sp-3); }
+.block-label .l { font-family: var(--font-mono); font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-secondary); }
+.block-label .l .idx { color: var(--text-muted); }
+.block-label .m { font-size: 0.72rem; color: var(--text-secondary); }
+
+/* Continue = hero block */
+.hero { display: flex; gap: var(--sp-4); padding: 0 var(--sp-5) var(--sp-5); }
+.hero-cover { width: 80px; height: 116px; flex-shrink: 0; background: linear-gradient(155deg,#5b1416,#1c0a0b); border-radius: var(--r-sm); }
+.hero-body { flex: 1; display: flex; flex-direction: column; }
+.hero-body .title { font-size: 1.15rem; font-weight: 600; line-height: 1.2; letter-spacing: -0.01em; }
+.hero-body .author { font-size: 0.78rem; color: var(--text-secondary); margin-top: 2px; }
+.hero-body .loc { font-family: var(--font-mono); font-size: 0.68rem; color: var(--text-muted); margin-top: var(--sp-3); }
+.hero-bar { height: 4px; background: var(--bg-soft); border-radius: 2px; margin-top: var(--sp-2); overflow: hidden; border: 1px solid var(--line); }
+.hero-bar > i { display: block; height: 100%; width: 4%; background: var(--bg-ink); }
+.hero-row { display: flex; align-items: center; gap: var(--sp-3); margin-top: var(--sp-3); }
+.btn-ink { background: var(--bg-ink); color: var(--text-inverse); font-size: 0.74rem; font-weight: 600; padding: 9px 16px; border-radius: var(--r-sm); cursor: pointer; }
+.pct-mono { font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-secondary); }
+
+/* Top picks = bordered list */
+.picks { border-top: 1px solid var(--line); }
+.pick { display: flex; align-items: center; gap: var(--sp-4); padding: var(--sp-3) var(--sp-5); border-bottom: 1px solid var(--line); cursor: pointer; }
+.pick-cover { width: 36px; height: 52px; border-radius: var(--r-sm); flex-shrink: 0; }
+.pick-info { flex: 1; min-width: 0; }
+.pick-info .pt { font-size: 0.9rem; font-weight: 600; line-height: 1.2; }
+.pick-info .pg { font-size: 0.7rem; color: var(--text-muted); margin-top: 1px; }
+.pick .badge { font-family: var(--font-mono); font-size: 0.58rem; text-transform: uppercase; color: var(--text-secondary); border: 1px solid var(--line-strong); padding: 3px 7px; border-radius: var(--r-sm); }
+
+/* ═══ LIBRARY ═══ */
+.lib { flex: 1; }
+.lib-filters { display: flex; overflow-x: auto; border-bottom: 1px solid var(--line); }
+.lib-filters .f { font-size: 0.74rem; color: var(--text-muted); cursor: pointer; padding: var(--sp-3) var(--sp-4); border-right: 1px solid var(--line); white-space: nowrap; display: flex; gap: 6px; align-items: center; }
+.lib-filters .f .n { font-family: var(--font-mono); font-size: 0.62rem; color: var(--text-muted); }
+.lib-filters .f.active { color: var(--text-primary); font-weight: 600; box-shadow: inset 0 -2px 0 var(--bg-ink); }
+.lib-list { }
+.lib-row { display: flex; gap: var(--sp-4); align-items: center; padding: var(--sp-4) var(--sp-5); border-bottom: 1px solid var(--line); }
+.lib-cover { width: 44px; height: 62px; border-radius: var(--r-sm); flex-shrink: 0; }
+.lib-meta { flex: 1; min-width: 0; }
+.lib-meta .lt { font-size: 0.95rem; font-weight: 600; line-height: 1.2; }
+.lib-meta .ls { font-size: 0.72rem; color: var(--text-secondary); margin-top: 2px; }
+.lib-meta .row2 { display: flex; gap: var(--sp-2); margin-top: var(--sp-2); }
+.lib-meta .tag { font-family: var(--font-mono); font-size: 0.58rem; text-transform: uppercase; color: var(--text-secondary); border: 1px solid var(--line-strong); padding: 2px 7px; border-radius: var(--r-sm); }
+.lib-actions { display: flex; gap: var(--sp-3); color: var(--text-muted); }
+.lib-actions span { cursor: pointer; font-size: 1rem; }
+.lib-actions .on { color: var(--text-primary); }
+
+/* ═══ READER ═══ */
+.reader { display: flex; flex-direction: column; flex: 1; background: var(--bg-reader); }
+.reader-top { display: grid; grid-template-columns: 36px 1fr 36px; align-items: center; padding: var(--sp-3) var(--sp-4); border-bottom: 1px solid var(--line); }
+.reader-top .ico { font-size: 1rem; color: var(--text-secondary); cursor: pointer; }
+.reader-top .ch { text-align: center; }
+.reader-top .ch .t { font-size: 0.84rem; font-weight: 600; }
+.reader-top .ch .s { font-family: var(--font-mono); font-size: 0.62rem; color: var(--text-muted); }
+.reader-body { flex: 1; padding: var(--sp-6) var(--sp-6) var(--sp-8); font-family: var(--font-reader); font-size: 1.05rem; line-height: 1.72; color: var(--reader-text); }
+.reader-body p { margin-bottom: 1.1em; }
+.reader-body .beat { color: var(--reader-muted); }
+.reader-foot { border-top: 1px solid var(--line); }
+.reader-seg { display: flex; gap: 3px; padding: var(--sp-3) var(--sp-5) 0; }
+.reader-seg i { flex: 1; height: 3px; background: var(--line-strong); border-radius: 1px; }
+.reader-seg i.on { background: var(--bg-ink); }
+.reader-foot .row { display: flex; justify-content: space-between; align-items: center; padding: var(--sp-3) var(--sp-5) var(--sp-4); }
+.reader-foot .pg { font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-muted); }
+.reader-foot .ctl { display: flex; gap: var(--sp-2); }
+.reader-foot .ctl span { font-size: 0.72rem; font-weight: 600; color: var(--text-secondary); border: 1px solid var(--line-strong); border-radius: var(--r-sm); padding: 5px 10px; cursor: pointer; }
+
+/* ═══ SETTINGS ═══ */
+.settings { flex: 1; }
+.set-block { padding: var(--sp-4) var(--sp-5); border-bottom: 1px solid var(--line); }
+.set-lbl { font-family: var(--font-mono); font-size: 0.64rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-muted); margin-bottom: var(--sp-3); display: flex; justify-content: space-between; }
+.fontsize { display: flex; align-items: center; justify-content: space-between; border: 1px solid var(--line); border-radius: var(--r-md); overflow: hidden; }
+.fontsize button { width: 46px; height: 42px; border: none; background: var(--bg-panel); border-right: 1px solid var(--line); font-size: 1.1rem; color: var(--text-primary); cursor: pointer; }
+.fontsize button:last-child { border-right: none; border-left: 1px solid var(--line); }
+.fontsize .aa { font-family: var(--font-reader); font-size: 1.4rem; flex: 1; text-align: center; }
+.seg { display: flex; border: 1px solid var(--line); border-radius: var(--r-md); overflow: hidden; }
+.seg .opt { flex: 1; text-align: center; font-size: 0.78rem; color: var(--text-secondary); padding: 9px; cursor: pointer; border-right: 1px solid var(--line); }
+.seg .opt:last-child { border-right: none; }
+.seg .opt.on { background: var(--bg-ink); color: var(--text-inverse); font-weight: 600; }
+.themes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; border: 1px solid var(--line); border-radius: var(--r-md); overflow: hidden; }
+.theme { padding: var(--sp-3) var(--sp-2); text-align: center; cursor: pointer; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); position: relative; }
+.theme:nth-child(3n) { border-right: none; }
+.theme:nth-child(n+4) { border-bottom: none; }
+.theme .aa { font-family: var(--font-reader); font-size: 1.25rem; display: block; }
+.theme .nm { font-family: var(--font-mono); font-size: 0.58rem; margin-top: 4px; text-transform: uppercase; }
+.theme.on { box-shadow: inset 0 0 0 2px var(--bg-ink); }
+.t-original { background: #f8f6ef; color: #191817; }
+.t-quiet    { background: #4f4f54; color: #efedf0; }
+.t-paper    { background: #fffdf6; color: #1a1b1d; }
+.t-bold     { background: #fbfaf7; color: #050505; }
+.t-calm     { background: #fff7e6; color: #2b2116; }
+.t-focus    { background: #f3f6f3; color: #111; }
+.slider { display: flex; align-items: center; gap: var(--sp-3); margin-top: var(--sp-3); }
+.slider .sl-lbl { font-size: 0.74rem; color: var(--text-secondary); width: 120px; }
+.slider .sl-val { font-family: var(--font-mono); font-size: 0.66rem; color: var(--text-muted); width: 34px; text-align: right; }
+.slider input[type=range] { flex: 1; accent-color: var(--bg-ink); height: 3px; }
+.toggle-row { display: flex; align-items: center; justify-content: space-between; }
+.toggle-row .tg-lbl { font-size: 0.82rem; }
+.toggle { width: 42px; height: 24px; border-radius: var(--r-sm); background: var(--bg-ink); position: relative; }
+.toggle::after { content: ''; position: absolute; top: 2px; left: 20px; width: 20px; height: 20px; border-radius: 3px; background: #fff; }
+
+/* ── Rationale ── */
+.rationale p { color: var(--text-secondary); font-size: 0.95rem; line-height: 1.75; max-width: 660px; }
+.rationale strong { color: var(--text-primary); }
+.rationale .fixes { list-style: none; margin-top: var(--sp-5); border: 1px solid var(--line); border-radius: var(--r-md); }
+.rationale .fixes li { padding: var(--sp-4) var(--sp-5); font-size: 0.9rem; color: var(--text-secondary); line-height: 1.5; border-bottom: 1px solid var(--line); display: flex; gap: var(--sp-4); }
+.rationale .fixes li:last-child { border-bottom: none; }
+.rationale .fixes li .n { font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-muted); flex-shrink: 0; }
+.rationale .fixes li strong { color: var(--text-primary); }
+
+@media (max-width: 760px) { .frames { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<div class="concept-header">
+  <div class="eyebrow">Minimalist Direction 3 / 3</div>
+  <h1>Index</h1>
+  <p>Structured, functional minimalism. A strict hairline grid, grotesk interface type with monospace metadata, and zero shadow — the quiet precision of a well-made tool.</p>
+</div>
+
+<!-- PALETTE + TYPE -->
+<section class="section">
+  <div class="kicker"><span class="idx">00</span> · Palette — cool monochrome, ink for action</div>
+  <h2>System</h2>
+  <div class="palette-grid">
+    <div class="swatch" style="background:#fafafa"><span>App</span><span class="hex">#fafafa</span></div>
+    <div class="swatch" style="background:#ffffff"><span>Panel</span><span class="hex">#ffffff</span></div>
+    <div class="swatch" style="background:#f4f4f5"><span>Soft</span><span class="hex">#f4f4f5</span></div>
+    <div class="swatch" style="background:#e4e4e7"><span>Line</span><span class="hex">#e4e4e7</span></div>
+    <div class="swatch" style="background:#52525b"><span style="color:#fff">Secondary</span><span class="hex" style="color:#d4d4d8">#52525b</span></div>
+    <div class="swatch" style="background:#18181b;border-right:none"><span style="color:#fff">Ink</span><span class="hex" style="color:#a1a1aa">#18181b</span></div>
+  </div>
+  <div class="type-spec">
+    <div class="row"><span class="lbl">Heading / UI</span><span class="ex-h">The Friction of the Spark</span></div>
+    <div class="row"><span class="lbl">Reader</span><span class="ex-r">The house kept the morning at nineteen degrees.</span></div>
+    <div class="row"><span class="lbl">Metadata</span><span class="ex-m">CH.01 · 04% · PAGE 1/14</span></div>
+  </div>
+</section>
+
+<!-- SCREENS: HOME + LIBRARY -->
+<section class="section">
+  <div class="kicker"><span class="idx">01</span> · The two browse screens</div>
+  <h2>Home &amp; Library</h2>
+  <div class="frames">
+    <!-- HOME -->
+    <div>
+      <div class="frame-label">Home</div>
+      <div class="phone"><div class="screen">
+        <div class="home">
+          <div class="scr-head"><h3>Home</h3><span class="count">MAY 29</span></div>
+          <div class="stats">
+            <div class="stat"><div class="v">3<small>/15</small></div><div class="k">min today</div></div>
+            <div class="stat"><div class="v">0</div><div class="k">finished</div></div>
+            <div class="stat"><div class="v">3</div><div class="k">in library</div></div>
+          </div>
+
+          <div class="block-label"><span class="l"><span class="idx">01</span> Continue</span></div>
+          <div class="hero">
+            <div class="hero-cover"></div>
+            <div class="hero-body">
+              <div class="title">The Friction of the Spark</div>
+              <div class="author">Shiminize</div>
+              <div class="loc">CH.01 — THE VACUUM</div>
+              <div class="hero-bar"><i></i></div>
+              <div class="hero-row"><span class="btn-ink">Resume reading</span><span class="pct-mono">04%</span></div>
+            </div>
+          </div>
+
+          <div class="block-label"><span class="l"><span class="idx">02</span> Top Picks</span><span class="m">View all →</span></div>
+          <div class="picks">
+            <div class="pick">
+              <div class="pick-cover" style="background:linear-gradient(155deg,#5b1416,#1c0a0b)"></div>
+              <div class="pick-info"><div class="pt">Ready to continue</div><div class="pg">Dark romantic suspense</div></div>
+              <span class="badge">Resume</span>
+            </div>
+            <div class="pick">
+              <div class="pick-cover" style="background:linear-gradient(155deg,#1f3a2c,#0e1a14)"></div>
+              <div class="pick-info"><div class="pt">Marked Want to Read</div><div class="pg">Structural Audit Notes</div></div>
+              <span class="badge">PDF</span>
+            </div>
+            <div class="pick">
+              <div class="pick-cover" style="background:linear-gradient(155deg,#6b1a1a,#2a0a0a)"></div>
+              <div class="pick-info"><div class="pt">Fits your shelf</div><div class="pg">Reader Sample</div></div>
+              <span class="badge">Sample</span>
+            </div>
+          </div>
+        </div>
+        <div class="nav-bar">
+          <div class="nav-item active"><span class="ic">⌂</span>Home</div>
+          <div class="nav-item"><span class="ic">▤</span>Library</div>
+          <div class="nav-item"><span class="ic">⌕</span>Search</div>
+        </div>
+      </div></div>
+    </div>
+
+    <!-- LIBRARY -->
+    <div>
+      <div class="frame-label">Library</div>
+      <div class="phone"><div class="screen">
+        <div class="lib">
+          <div class="scr-head"><h3>Library</h3><span class="count">03 ITEMS</span></div>
+          <div class="lib-filters">
+            <span class="f active">All <span class="n">3</span></span>
+            <span class="f">Continue <span class="n">1</span></span>
+            <span class="f">Want <span class="n">1</span></span>
+            <span class="f">Finished <span class="n">0</span></span>
+            <span class="f">PDFs <span class="n">1</span></span>
+          </div>
+          <div class="lib-list">
+            <div class="lib-row">
+              <div class="lib-cover" style="background:linear-gradient(155deg,#5b1416,#1c0a0b)"></div>
+              <div class="lib-meta">
+                <div class="lt">The Friction of the Spark</div>
+                <div class="ls">Shiminize</div>
+                <div class="row2"><span class="tag">Book</span><span class="tag">04%</span></div>
+              </div>
+              <div class="lib-actions"><span class="on">★</span><span>✓</span></div>
+            </div>
+            <div class="lib-row">
+              <div class="lib-cover" style="background:linear-gradient(155deg,#1f3a2c,#0e1a14)"></div>
+              <div class="lib-meta">
+                <div class="lt">Structural Audit Notes</div>
+                <div class="ls">Project reference</div>
+                <div class="row2"><span class="tag">PDF</span><span class="tag">Want</span></div>
+              </div>
+              <div class="lib-actions"><span>☆</span><span class="on">✓</span></div>
+            </div>
+            <div class="lib-row">
+              <div class="lib-cover" style="background:linear-gradient(155deg,#6b1a1a,#2a0a0a)"></div>
+              <div class="lib-meta">
+                <div class="lt">Reader Sample</div>
+                <div class="ls">Sample collection entry</div>
+                <div class="row2"><span class="tag">Sample</span></div>
+              </div>
+              <div class="lib-actions"><span>☆</span><span>✓</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="nav-bar">
+          <div class="nav-item"><span class="ic">⌂</span>Home</div>
+          <div class="nav-item active"><span class="ic">▤</span>Library</div>
+          <div class="nav-item"><span class="ic">⌕</span>Search</div>
+        </div>
+      </div></div>
+    </div>
+  </div>
+</section>
+
+<!-- SCREENS: READER + SETTINGS -->
+<section class="section">
+  <div class="kicker"><span class="idx">02</span> · The reading surface &amp; its controls</div>
+  <h2>Reader &amp; Settings</h2>
+  <div class="frames">
+    <!-- READER -->
+    <div>
+      <div class="frame-label">Reader — segmented progress, mono page count</div>
+      <div class="phone"><div class="screen reader">
+        <div class="reader-top">
+          <span class="ico">‹</span>
+          <div class="ch"><div class="t">The Vacuum</div><div class="s">CHAPTER 01</div></div>
+          <span class="ico">✕</span>
+        </div>
+        <div class="reader-body">
+          <p>The house kept the morning at nineteen degrees.</p>
+          <p class="beat">Not cool. Not warm. Correct.</p>
+          <p>Eline crossed the foyer by the marble seams, heel to edge, edge to heel, never cutting through the white center of a tile. The stone had been polished until it held the light without reflecting it. There were no soft places here.</p>
+          <p class="beat">Her shoes should have clicked.</p>
+          <p class="beat">They did not.</p>
+        </div>
+        <div class="reader-foot">
+          <div class="reader-seg"><i class="on"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+          <div class="row">
+            <span class="pg">PAGE 01 / 14</span>
+            <div class="ctl"><span>Aa</span><span>Contents</span></div>
+          </div>
+        </div>
+      </div></div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div>
+      <div class="frame-label">Themes &amp; Settings</div>
+      <div class="phone"><div class="screen">
+        <div class="settings">
+          <div class="scr-head"><h3>Settings</h3><span class="count">✕</span></div>
+
+          <div class="set-block">
+            <div class="set-lbl">Text size</div>
+            <div class="fontsize"><button>−</button><span class="aa">Aa</span><button>+</button></div>
+          </div>
+
+          <div class="set-block">
+            <div class="set-lbl">Page turn</div>
+            <div class="seg"><span class="opt">Curl</span><span class="opt on">Fast Fade</span><span class="opt">Scroll</span></div>
+          </div>
+
+          <div class="set-block">
+            <div class="set-lbl">Reader theme</div>
+            <div class="themes">
+              <div class="theme t-original on"><span class="aa">Aa</span><span class="nm">Original</span></div>
+              <div class="theme t-quiet"><span class="aa">Aa</span><span class="nm">Quiet</span></div>
+              <div class="theme t-paper"><span class="aa">Aa</span><span class="nm">Paper</span></div>
+              <div class="theme t-bold"><span class="aa">Aa</span><span class="nm">Bold</span></div>
+              <div class="theme t-calm"><span class="aa">Aa</span><span class="nm">Calm</span></div>
+              <div class="theme t-focus"><span class="aa">Aa</span><span class="nm">Focus</span></div>
+            </div>
+          </div>
+
+          <div class="set-block" style="border-bottom:none">
+            <div class="set-lbl">Customize</div>
+            <div class="toggle-row"><span class="tg-lbl">Bold text</span><span class="toggle"></span></div>
+            <div class="slider"><span class="sl-lbl">Line spacing</span><input type="range" min="0" max="100" value="55"><span class="sl-val">1.5</span></div>
+            <div class="slider"><span class="sl-lbl">Character spacing</span><input type="range" min="0" max="100" value="30"><span class="sl-val">0.3</span></div>
+            <div class="slider"><span class="sl-lbl">Brightness</span><input type="range" min="0" max="100" value="72"><span class="sl-val">72</span></div>
+          </div>
+        </div>
+      </div></div>
+    </div>
+  </div>
+</section>
+
+<!-- RATIONALE -->
+<section class="section rationale" style="padding-bottom:96px">
+  <div class="kicker"><span class="idx">03</span> · Why this direction</div>
+  <h2>Index</h2>
+  <p><strong>Index treats the reader like a precise instrument.</strong> Structure comes entirely from a hairline grid — no shadows, no fills, no rounded blobs. Grotesk type handles the interface while monospace carries every number (progress, page, counts), so data always looks like data. The page art is the only colour; everything else is ink on cool white.</p>
+  <ul class="fixes">
+    <li><span class="n">01</span><span><strong>Continue is the first block</strong> with a solid-ink "Resume reading" button — the one unmissable action on Home.</span></li>
+    <li><span class="n">02</span><span><strong>A stat strip replaces the cramped ring</strong> — three monospace figures (min today, finished, in library) read instantly.</span></li>
+    <li><span class="n">03</span><span><strong>Library becomes a clean data list</strong> with monospace tags and counts on every filter, so the catalogue feels indexed.</span></li>
+    <li><span class="n">04</span><span><strong>The reader shows a segmented progress strip</strong> and a single <code>PAGE 01/14</code> — no duplicate counters, no floating circles.</span></li>
+    <li><span class="n">05</span><span><strong>Desktop scales into a true two-column grid</strong> (list + detail) — the hairline system fills wide canvases without dead space.</span></li>
+  </ul>
+</section>
+
+</body>
+</html>

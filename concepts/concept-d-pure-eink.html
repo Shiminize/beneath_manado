@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Concept D — E-Ink Minimal</title>
+  <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,300;0,400;0,500;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    /* ═══════════════════════════════════════════
+       CONCEPT D: E-INK MINIMAL
+       High contrast, pure typography, no distractions.
+       Fits exactly on iPhone 17 (393 x 852).
+       ═══════════════════════════════════════════ */
+    :root {
+      --bg: #ffffff;
+      --surface: #f4f4f4;
+      --text: #111111;
+      --text-muted: #666666;
+      --border: #e0e0e0;
+      --accent: #000000;
+      
+      --sp-1: 4px; --sp-2: 8px; --sp-3: 12px; --sp-4: 16px;
+      --sp-5: 20px; --sp-6: 24px; --sp-8: 32px;
+      
+      --font-sans: 'Inter', sans-serif;
+      --font-serif: 'Newsreader', serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    
+    body {
+      font-family: var(--font-sans);
+      background: #e5e5e5;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    /* iPhone 17 Container */
+    #device {
+      width: 393px;
+      height: 852px;
+      background: var(--bg);
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+      border-radius: 40px;
+      border: 8px solid #222;
+    }
+    
+    /* Device status bar spacing simulation */
+    .status-bar-spacer { height: 48px; width: 100%; }
+
+    .screen {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 84px; /* bottom nav height */
+      display: none;
+      flex-direction: column;
+      background: var(--bg);
+    }
+    .screen.active { display: flex; }
+
+    /* ── Nav Bar ── */
+    #nav {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 84px;
+      background: var(--bg);
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-around;
+      padding-bottom: 20px; /* Safe area */
+      align-items: center;
+      z-index: 100;
+    }
+    .nav-btn {
+      flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px;
+      color: var(--text-muted); font-size: 0.65rem; font-weight: 500;
+      background: none; border: none; cursor: pointer;
+    }
+    .nav-btn.active { color: var(--accent); }
+    .nav-btn .icon { font-size: 1.2rem; }
+
+    /* ── Home Screen ── */
+    #home { padding: 0 var(--sp-5); }
+    .header { padding: var(--sp-4) 0 var(--sp-6); }
+    .header h1 { font-family: var(--font-serif); font-size: 2rem; font-weight: 500; letter-spacing: -0.02em; }
+    
+    .metric-card {
+      border: 1px solid var(--border);
+      padding: var(--sp-4);
+      border-radius: 16px;
+      margin-bottom: var(--sp-6);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .metric-val { font-size: 1.5rem; font-weight: 600; font-family: var(--font-serif); }
+    .metric-lbl { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+    
+    .section-title { font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: var(--sp-3); }
+    
+    .continue-reading {
+      display: flex; gap: var(--sp-4);
+      padding: var(--sp-4);
+      background: var(--surface);
+      border-radius: 12px;
+      margin-bottom: var(--sp-6);
+    }
+    .book-cover { width: 60px; height: 90px; background: #222; color: #fff; display: flex; align-items: center; justify-content: center; font-family: var(--font-serif); font-size: 0.6rem; text-align: center; line-height: 1.2; border-radius: 4px; }
+    .book-info { flex: 1; display: flex; flex-direction: column; justify-content: center; }
+    .book-title { font-family: var(--font-serif); font-size: 1.1rem; font-weight: 500; }
+    .book-meta { font-size: 0.75rem; color: var(--text-muted); margin-top: 4px; }
+    .progress { height: 2px; background: var(--border); margin-top: 12px; position: relative; }
+    .progress-fill { position: absolute; left: 0; top: 0; height: 100%; width: 45%; background: var(--accent); }
+
+    .picks-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-4); }
+    .pick-item .p-cover { aspect-ratio: 3/4; border: 1px solid var(--border); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-family: var(--font-serif); font-size: 0.8rem; text-align: center; color: var(--text-muted); margin-bottom: 8px; }
+    .pick-item .p-title { font-size: 0.8rem; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    /* ── Reader Screen ── */
+    #reader { padding: 0 var(--sp-5); height: 100%; bottom: 0; z-index: 200; }
+    .reader-top { display: flex; justify-content: space-between; align-items: center; padding: var(--sp-3) 0; border-bottom: 1px solid var(--border); }
+    .reader-top .btn { font-size: 1.2rem; cursor: pointer; color: var(--text); background: none; border: none; }
+    .reader-top .chapter { font-size: 0.75rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; }
+    
+    .reader-content { flex: 1; padding: var(--sp-6) 0; overflow-y: auto; }
+    .reader-text { font-family: var(--font-serif); font-size: 1.25rem; line-height: 1.6; color: var(--text); }
+    .reader-text p { margin-bottom: 1.2em; text-indent: 1.5em; }
+    .reader-text p:first-child { text-indent: 0; }
+    
+    .reader-bottom { padding: var(--sp-4) 0 var(--sp-6); display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border); }
+    .page-info { font-size: 0.75rem; color: var(--text-muted); font-variant-numeric: tabular-nums; }
+
+    /* ── Settings Screen ── */
+    #settings { padding: 0 var(--sp-5); }
+    .set-header { font-family: var(--font-serif); font-size: 2rem; margin: var(--sp-4) 0 var(--sp-6); }
+    .set-group { margin-bottom: var(--sp-8); }
+    .set-row { display: flex; justify-content: space-between; align-items: center; padding: var(--sp-4) 0; border-bottom: 1px solid var(--border); }
+    .set-label { font-size: 0.9rem; font-weight: 500; }
+    .set-control { display: flex; gap: var(--sp-2); }
+    .ctrl-btn { width: 40px; height: 40px; border-radius: 20px; border: 1px solid var(--border); background: var(--bg); font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    .ctrl-btn.active { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+
+    @media (max-width: 400px) {
+      body { background: #000; }
+      #device { border-radius: 0; border: none; width: 100vw; height: 100vh; box-shadow: none; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="device">
+  <div class="status-bar-spacer"></div>
+
+  <!-- HOME SCREEN -->
+  <div id="screen-home" class="screen active">
+    <div id="home">
+      <div class="header">
+        <h1>Library</h1>
+      </div>
+      
+      <div class="metric-card">
+        <div>
+          <div class="metric-val">45 m</div>
+          <div class="metric-lbl">Read Today</div>
+        </div>
+        <div>
+          <div class="metric-val">12</div>
+          <div class="metric-lbl">Books Finished</div>
+        </div>
+      </div>
+
+      <div class="section-title">Current Read</div>
+      <div class="continue-reading" onclick="switchScreen('reader')">
+        <div class="book-cover">THE<br>FRICTION<br>OF THE<br>SPARK</div>
+        <div class="book-info">
+          <div class="book-title">The Friction of the Spark</div>
+          <div class="book-meta">Chapter 4 • 45%</div>
+          <div class="progress"><div class="progress-fill"></div></div>
+        </div>
+      </div>
+
+      <div class="section-title">Up Next</div>
+      <div class="picks-grid">
+        <div class="pick-item">
+          <div class="p-cover">Design Notes</div>
+          <div class="p-title">Structural Audit</div>
+        </div>
+        <div class="pick-item">
+          <div class="p-cover">Anthology</div>
+          <div class="p-title">Sunrise Harvest</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- READER SCREEN -->
+  <div id="screen-reader" class="screen" style="display:none; bottom:0;">
+    <div id="reader">
+      <div class="reader-top">
+        <button class="btn" onclick="switchScreen('home')">✕</button>
+        <div class="chapter">CHAPTER 4</div>
+        <button class="btn" onclick="switchScreen('settings')">Aa</button>
+      </div>
+      
+      <div class="reader-content">
+        <div class="reader-text">
+          <p>The house kept the morning at nineteen degrees. Not cool. Not warm. Correct.</p>
+          <p>Eline crossed the foyer by the marble seams, heel to edge, edge to heel, never cutting through the white center of a tile. The stone had been polished until it held the light without reflecting it.</p>
+          <p>Her shoes should have clicked. They did not.</p>
+          <p>The foyer took each step from her and stored it somewhere deep in the walls. There were no soft places here. No loose rugs. No crooked flowers.</p>
+          <p>She paused at the heavy oak door. The handle was cold iron, forged in a century that didn't care about comfort. She turned it, and the sound echoed like a gunshot in the silent house.</p>
+        </div>
+      </div>
+      
+      <div class="reader-bottom">
+        <button class="btn">←</button>
+        <div class="page-info">PAGE 42 OF 318</div>
+        <button class="btn">→</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SETTINGS SCREEN -->
+  <div id="screen-settings" class="screen" style="display:none;">
+    <div id="settings">
+      <div class="set-header">Display</div>
+      
+      <div class="set-group">
+        <div class="set-row">
+          <div class="set-label">Type Size</div>
+          <div class="set-control">
+            <button class="ctrl-btn">−</button>
+            <button class="ctrl-btn">+</button>
+          </div>
+        </div>
+        <div class="set-row">
+          <div class="set-label">Line Height</div>
+          <div class="set-control">
+            <button class="ctrl-btn">≡</button>
+            <button class="ctrl-btn active">↕</button>
+          </div>
+        </div>
+        <div class="set-row">
+          <div class="set-label">Theme</div>
+          <div class="set-control">
+            <button class="ctrl-btn active" style="background:#fff;border:2px solid #000">L</button>
+            <button class="ctrl-btn" style="background:#f4ebd8;border:1px solid #ccc;color:#000">S</button>
+            <button class="ctrl-btn" style="background:#000;color:#fff">D</button>
+          </div>
+        </div>
+        <div class="set-row">
+          <div class="set-label">Font Family</div>
+          <div class="set-control">
+            <button class="ctrl-btn active" style="font-family:serif;font-style:italic">Aa</button>
+            <button class="ctrl-btn" style="font-family:sans-serif">Aa</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <nav id="nav">
+    <button class="nav-btn active" onclick="switchScreen('home')">
+      <span class="icon">⌂</span>
+      <span>Home</span>
+    </button>
+    <button class="nav-btn" onclick="switchScreen('reader')">
+      <span class="icon">📖</span>
+      <span>Read</span>
+    </button>
+    <button class="nav-btn" onclick="switchScreen('settings')">
+      <span class="icon">⚙</span>
+      <span>Settings</span>
+    </button>
+  </nav>
+
+</div>
+
+<script>
+  function switchScreen(id) {
+    document.querySelectorAll('.screen').forEach(el => {
+      el.style.display = 'none';
+      el.classList.remove('active');
+    });
+    const target = document.getElementById('screen-' + id);
+    target.style.display = 'flex';
+    target.classList.add('active');
+    
+    // Hide nav on reader
+    document.getElementById('nav').style.display = id === 'reader' ? 'none' : 'flex';
+    
+    // Update nav icons
+    if(id !== 'reader') {
+      document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+      event.currentTarget.classList.add('active');
+    }
+  }
+</script>
+</body>
+</html>

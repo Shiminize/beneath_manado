@@ -2,43 +2,46 @@
   align-items: flex-start;
 }
 
+/* Goal stat — a quiet figure with a claret progress underline (no ring). */
 .goal-ring {
   --goal-progress: 0%;
-  width: var(--space-13-5);
-  height: var(--space-13-5);
-  border-radius: var(--radius-ring);
-  display: grid;
-  place-items: center;
-  background:
-    radial-gradient(circle, var(--app-surface-strong) 58%, transparent 60%),
-    conic-gradient(var(--app-cyan) var(--goal-progress), var(--app-subtle) 0);
-  box-shadow: var(--generated-shadow-var-neg-neg-appneg-shadow);
-  position: relative;
-}
-
-.goal-ring span,
-.goal-ring small {
-  grid-area: 1 / 1;
+  display: inline-grid;
+  grid-auto-flow: column;
+  align-items: baseline;
+  gap: var(--space-1);
+  padding-bottom: var(--space-1-5);
+  background-image:
+    linear-gradient(var(--action-primary), var(--action-primary)),
+    linear-gradient(var(--border-subtle), var(--border-subtle));
+  background-repeat: no-repeat;
+  background-size: var(--goal-progress) var(--stroke-strong), var(--size-full) var(--stroke-hairline);
+  background-position: left bottom, left bottom;
 }
 
 .goal-ring span {
-  font-weight: 700;
-  transform: translateY(var(--generated-length-neg-4px));
+  font-family: var(--font-display);
+  font-size: var(--text-heading-sm);
+  font-weight: 500;
+  color: var(--text-primary);
 }
 
 .goal-ring small {
-  color: var(--app-muted);
-  font-size: var(--text-ui-xs);
-  transform: translateY(var(--space-2-5));
+  color: var(--text-muted);
+  font-size: var(--text-ui-sm);
 }
 
+.goal-ring small::before {
+  content: '/ ';
+}
+
+/* Quiet flat panels — hairline, no shadow. */
 .goal-panel,
 .year-summary,
 .collection-form,
 .search-field {
   background: var(--surface-panel);
+  border: var(--stroke-hairline) solid var(--border-subtle);
   border-radius: var(--radius-ui);
-  box-shadow: var(--shadow-soft);
 }
 
 .goal-panel {
@@ -54,17 +57,13 @@
 .goal-panel strong,
 .goal-panel span {
   display: block;
-}
-
-.goal-panel span {
-  color: var(--app-muted);
-  margin-top: var(--space-1);
-}
-
-.goal-panel strong,
-.goal-panel span {
   font-size: var(--text-control);
   line-height: var(--line-compact);
+}
+
+.goal-panel span {
+  color: var(--text-muted);
+  margin-top: var(--space-1);
 }
 
 .goal-panel .goal-controls {
@@ -87,15 +86,16 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--space-3-5);
-  margin-bottom: var(--space-3-5);
+  margin-bottom: var(--space-4);
 }
 
 .section-block h2 {
-  margin: 0 0 var(--space-3-5);
-  font-family: var(--font-serif);
+  margin: 0 0 var(--space-4);
+  font-family: var(--font-display);
   font-size: var(--text-heading-md);
-  line-height: 1.1;
-  letter-spacing: 0;
+  font-weight: 500;
+  line-height: var(--line-heading);
+  letter-spacing: var(--tracking-tight);
 }
 
 .section-title-row h2 {
@@ -105,29 +105,27 @@
 .continue-rail,
 .cover-row {
   display: flex;
-  gap: var(--space-3-5);
+  gap: var(--space-5);
   overflow-x: auto;
   padding: var(--space-0-5) var(--space-0-5) var(--space-3);
   scroll-snap-type: x proximity;
 }
 
+/* Continue = the hero. Flat, editorial, no coloured card. */
 .continue-card {
-  min-width: var(--generated-length-276px);
-  max-width: var(--generated-length-320px);
+  min-width: min(var(--size-full), var(--width-continue-card));
+  max-width: var(--width-continue-card);
   display: grid;
-  grid-template-columns: var(--space-13-5) 1fr;
-  gap: var(--space-3-5);
+  grid-template-columns: var(--space-16) 1fr;
+  gap: var(--space-5);
   align-items: center;
-  padding: var(--space-4);
-  background: var(--app-accent-strong);
-  color: var(--color-neutral-0);
-  border-radius: var(--radius-ui);
-  box-shadow: var(--generated-shadow-var-neg-neg-appneg-shadow);
+  padding: var(--space-1);
+  color: var(--text-primary);
   scroll-snap-align: start;
 }
 
 .continue-card .book-cover {
-  --book-cover-shadow: var(--shadow-book-cover-compact);
+  --book-cover-shadow: var(--shadow-book-cover);
 }
 
 .continue-card strong,
@@ -138,66 +136,79 @@
   display: block;
 }
 
+.continue-card strong {
+  font-family: var(--font-display);
+  font-size: var(--text-heading-sm);
+  font-weight: 500;
+  line-height: var(--line-heading);
+  letter-spacing: var(--tracking-tight);
+}
+
 .continue-card small {
-  color: var(--generated-color-rgba-255-255-255-0neg-82);
+  color: var(--text-muted);
+  font-size: var(--text-ui-md);
+  margin-top: var(--space-1);
+}
+
+.continue-card small:last-child {
+  margin-top: var(--space-3);
+  color: var(--action-primary);
+  font-weight: 600;
 }
 
 .top-picks-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: var(--space-3);
+  gap: var(--space-4);
 }
 
+/* Top Picks = quiet. Cover carries the only colour. */
 .pick-card {
   min-width: 0;
   padding: 0;
   display: grid;
   grid-template-rows: auto 1fr;
   align-content: start;
-  border-radius: var(--radius-ui);
-  color: var(--app-ink);
+  color: var(--text-primary);
 }
 
 .pick-card .book-cover {
-  --book-cover-shadow: var(--shadow-book-cover);
+  --book-cover-shadow: var(--shadow-book-cover-compact);
 }
 
 .pick-card-content {
   min-width: 0;
-  padding: var(--space-2-5) var(--space-0-5) var(--space-0);
+  padding: var(--space-3) var(--space-0-5) var(--space-0);
 }
 
 .pick-card strong {
+  font-family: var(--font-display);
   font-size: var(--text-ui-lg);
-  line-height: 1.2;
+  font-weight: 500;
+  line-height: var(--line-card);
   overflow-wrap: anywhere;
 }
 
 .pick-card small {
   margin-top: var(--space-1);
-  color: var(--app-muted);
+  color: var(--text-muted);
   font-size: var(--text-ui-sm);
-  line-height: 1.25;
+  line-height: var(--line-compact);
   overflow-wrap: anywhere;
 }
 
 .pick-card-marker {
-  min-height: var(--space-5);
   width: max-content;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: var(--space-0-5) var(--space-2);
-  border-radius: var(--radius-pill);
-  background: var(--app-accent);
-  color: var(--action-primary-text);
+  color: var(--action-primary);
   margin-bottom: var(--space-1);
-  box-shadow: var(--shadow-book-cover-compact);
 }
 
 .cover-tile {
-  width: var(--generated-length-126px);
-  flex: 0 0 var(--generated-length-126px);
+  width: var(--width-cover-tile);
+  flex: 0 0 var(--width-cover-tile);
   display: flex;
   flex-direction: column;
   align-items: stretch;
@@ -207,8 +218,8 @@
 
 .cover-tile-title {
   margin-top: var(--space-2);
-  font-size: var(--text-ui-lg);
-  line-height: 1.25;
+  font-size: var(--text-ui-md);
+  line-height: var(--line-compact);
 }
 
 .year-summary {
@@ -216,32 +227,36 @@
   grid-template-columns: auto 1fr;
   column-gap: var(--space-3);
   row-gap: var(--space-0-5);
-  padding: var(--space-4);
+  padding: var(--space-4) var(--space-5);
 }
 
 .year-summary svg {
   grid-row: span 2;
-  color: var(--app-accent);
+  color: var(--action-primary);
+}
+
+.year-summary strong {
+  font-family: var(--font-display);
+  font-weight: 500;
 }
 
 .privacy-note {
-  color: var(--app-muted);
+  color: var(--text-muted);
   font-size: var(--text-ui-sm);
   line-height: var(--line-copy);
 }
 
 @media (max-width: 700px) {
   .top-picks-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: var(--space-2);
+    gap: var(--space-3);
   }
 
   .pick-card-content {
-    padding: var(--space-2);
+    padding: var(--space-2) var(--space-0-5) var(--space-0);
   }
 
   .pick-card strong {
-    font-size: var(--text-ui-sm);
+    font-size: var(--text-ui-md);
   }
 
   .pick-card small {
@@ -252,8 +267,8 @@
 @media (min-width: 900px) {
   .screen-home {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(var(--generated-length-320px), var(--generated-length-396px));
-    column-gap: var(--space-7);
+    grid-template-columns: minmax(0, 1fr) minmax(var(--width-home-aside-min), var(--width-home-aside-max));
+    column-gap: var(--space-8);
     align-items: start;
   }
 
@@ -270,20 +285,23 @@
   }
 
   .home-top-picks-section {
-    grid-column: 1 / -1;
+    grid-column: 2;
+    grid-row: 3 / span 3;
+    margin-top: var(--space-0);
   }
 
   .home-top-picks-section .top-picks-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: var(--space-4);
+    grid-template-columns: 1fr;
+    gap: var(--space-5);
   }
 
   .home-top-picks-section .pick-card {
-    display: grid;
-    grid-template-columns: 1fr;
+    grid-template-columns: var(--space-16) 1fr;
+    gap: var(--space-4);
+    align-items: center;
   }
 
   .home-top-picks-section .pick-card-content {
-    display: block;
+    padding: var(--space-0);
   }
 }
