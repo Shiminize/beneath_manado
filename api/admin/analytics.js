@@ -1,6 +1,6 @@
 import { getQueryParam, requireMethod, sendJson } from '../_lib/http.js';
 import { getSetupStatus, assertAdmin } from '../_lib/security.js';
-import { getAnalyticsSnapshot, listBooksForAdmin } from '../_lib/database.js';
+import { getAnalyticsSnapshot, listBooksForAdmin, toAdminBookSummary } from '../_lib/database.js';
 
 const rangeDaysByKey = {
   '7d': 7,
@@ -21,13 +21,7 @@ export default async function handler(request, response) {
   const snapshot = await getAnalyticsSnapshot({ rangeDays: rangeDaysByKey[range] || 30, bookId });
   const accessRows = await listBooksForAdmin();
   const analyticsByBookId = new Map(snapshot.books.map((book) => [book.id, book]));
-  const books = accessRows.map((book) => ({
-    ...book,
-    readingSessions: analyticsByBookId.get(book.id)?.readingSessions || 0,
-    views: analyticsByBookId.get(book.id)?.readingSessions || 0,
-    sessions: analyticsByBookId.get(book.id)?.sessions || 0,
-    maxPercent: analyticsByBookId.get(book.id)?.maxPercent || 0
-  }));
+  const books = accessRows.map((book) => toAdminBookSummary(book, analyticsByBookId.get(book.id)));
   const { books: _analyticsBookRows, ...snapshotWithoutBooks } = snapshot;
 
   sendJson(response, 200, {

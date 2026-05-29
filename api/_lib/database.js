@@ -40,6 +40,22 @@ export async function listBooksForAdmin() {
   return rows.map(mapBookRow);
 }
 
+export function toAdminBookSummary(book, analytics) {
+  return {
+    id: book.id,
+    title: book.title,
+    locked: book.locked,
+    hasPassword: book.hasPassword,
+    passwordDisplay: book.passwordDisplay,
+    passwordState: book.passwordState,
+    passwordUpdatedAt: book.passwordUpdatedAt,
+    readingSessions: analytics?.readingSessions || 0,
+    views: analytics?.readingSessions || 0,
+    sessions: analytics?.sessions || 0,
+    maxPercent: analytics?.maxPercent || 0
+  };
+}
+
 export async function getBookRecord(bookId) {
   if (!hasDatabase()) {
     const seed = getSeedBook(bookId);
@@ -679,7 +695,7 @@ function isReadingSessionEvent(event) {
 
 function getReadingSessionMode(eventType) {
   if (eventType === 'book_open' || eventType === 'reading_session_start') return 'start';
-  if (eventType === 'session_end' || eventType === 'reading_session_end') return 'end';
+  if (eventType === 'reading_session_end') return 'end';
   return 'heartbeat';
 }
 

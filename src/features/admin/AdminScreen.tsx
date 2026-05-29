@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { CSSProperties, FormEvent } from 'react';
 import {
   Activity,
@@ -96,16 +96,19 @@ export function AdminScreen() {
   const [loginRequired, setLoginRequired] = useState(false);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState<string | null>(null);
+  const requestRef = useRef(0);
 
   useEffect(() => {
     void loadAnalytics();
   }, [range]);
 
   async function loadAnalytics() {
+    const requestId = ++requestRef.current;
     setLoading(true);
     setMessage(null);
     const statusResponse = await fetch('/api/admin/status', { credentials: 'include' });
     const statusPayload: AdminStatus = await statusResponse.json().catch(() => ({}));
+    if (requestId !== requestRef.current) return;
 
     if (!statusResponse.ok) {
       setLoading(false);
@@ -122,8 +125,12 @@ export function AdminScreen() {
       return;
     }
 
+    // Authenticated: leave the login form regardless of how the analytics fetch resolves.
+    setLoginRequired(false);
+
     const response = await fetch(`/api/admin/analytics?range=${range}`, { credentials: 'include' });
     const payload = await response.json().catch(() => ({}));
+    if (requestId !== requestRef.current) return;
     setLoading(false);
 
     if (response.status === 401) {
@@ -138,7 +145,6 @@ export function AdminScreen() {
       return;
     }
 
-    setLoginRequired(false);
     setSetupStatus(payload.setup || null);
     setSnapshot(payload);
   }
@@ -165,7 +171,7 @@ export function AdminScreen() {
 
   async function updateBookAccess(bookId: string, locked: boolean, nextPassword: string) {
     setMessage(null);
-    const response = await fetch(`/api/admin/books/${bookId}/access`, {
+    const response = await fetch(`/api/admin/books/${encodeURIComponent(bookId)}/access`, {
       method: 'PATCH',
       credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
@@ -393,6 +399,7 @@ function BookAccessRow({
   const [sessionsLoading, setSessionsLoading] = useState(false);
   const [sessionsError, setSessionsError] = useState<string | null>(null);
   const [readingSessions, setReadingSessions] = useState<BookReadingSession[] | null>(null);
+  const sessionsRequestRef = useRef(0);
 
   useEffect(() => {
     if (sessionsOpen) void loadBookSessions();
@@ -417,6 +424,7 @@ function BookAccessRow({
   }
 
   async function loadBookSessions() {
+    const requestId = ++sessionsRequestRef.current;
     setSessionsLoading(true);
     setSessionsError(null);
 
@@ -424,6 +432,7 @@ function BookAccessRow({
       credentials: 'include'
     });
     const payload = await response.json().catch(() => ({}));
+    if (requestId !== sessionsRequestRef.current) return;
     setSessionsLoading(false);
 
     if (!response.ok) {
